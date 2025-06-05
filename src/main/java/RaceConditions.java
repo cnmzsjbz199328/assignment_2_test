@@ -1,4 +1,4 @@
-package main.java;
+
 // RaceConditions class (from Prompt 4)
 class RaceConditions {
     private String weather;

@@ -1,4 +1,4 @@
-package main.java;
+
 // Tyres class (from Prompt 2)
 class Tyres {
     private String compound;

@@ -1,4 +1,4 @@
-package main.java;
+
 // Re-including helper and component classes for completeness and context
 // TemperatureRange class (from Prompt 2)
 class TemperatureRange {

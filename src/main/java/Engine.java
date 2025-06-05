@@ -1,5 +1,3 @@
-package main.java;
-// Engine class (from Prompt 2)
 class Engine {
     private String name;
     private int powerRating;      // HP

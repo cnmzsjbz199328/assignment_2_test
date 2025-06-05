@@ -1,4 +1,4 @@
-package main.java;
+
 // AerodynamicKit class (UPDATED for Prompt 6)
 class AerodynamicKit {
     private String kitName;

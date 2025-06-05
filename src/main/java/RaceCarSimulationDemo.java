@@ -1,4 +1,4 @@
-package main.java;
+
 class RaceCarSimulationDemo {
     public static void main(String[] args) {
         // Create instances of component variations

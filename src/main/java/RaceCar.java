@@ -1,4 +1,4 @@
-package main.java;
+
 // RaceCar class definition (UPDATED for Prompt 8)
 class RaceCar {
     private Engine engine;

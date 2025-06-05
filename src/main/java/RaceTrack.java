@@ -1,4 +1,4 @@
-package main.java;
+
 // RaceTrack class (from Prompt 4)
 class RaceTrack {
     private String name;
