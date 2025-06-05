@@ -1,12 +1,16 @@
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos; // Import Pos for alignment
+import javafx.geometry.Orientation; // Keep this import
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.*; // Import all layout classes
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -23,6 +27,7 @@ import java.util.concurrent.Executors;
 // import RaceTrack;
 // import TemperatureRange;
 // import Tyres;
+// import PitStopData; // Import the new helper class
 
 
 public class Main extends Application {
@@ -46,23 +51,38 @@ public class Main extends Application {
     // Action Buttons
     private Button configureButton;
     private Button startSimulationButton;
+    private Button resetButton; // New Reset button
 
     // Car Stats Display
-    private Label carStatsTitleLabel;
+    // Removed carStatsTitleLabel as TitledPane handles title or we use a simple Label
     private Label topSpeedLabel;
     private Label accelerationLabel;
     private Label accelerationProfileLabel;
     private Label handlingLabel;
     private Label corneringAbilityLabel;
     private Label fuelConsumptionLabel;
+    private Label fuelTankCapacityDisplayLabel; // Display fuel tank capacity from car
+    private Label carWeightDisplayLabel; // Display car weight from car
+
 
     // Simulation Progress and Output
-    private Label simulationTitleLabel;
+    // Removed simulationTitleLabel as TitledPane handles title or we use a simple Label
     private ProgressBar raceProgressBar;
     private Label currentFuelLabel;
     private Label currentTyreWearLabel;
-    private TextArea raceLogTextArea;
-    private Label outputLabel; // Declared outputLabel here
+    private TextArea raceLogTextArea; // Keep for general log
+    // Removed outputLabel, using statusLabel at the bottom instead
+
+    // Pit Stop Display
+    // Removed pitStopsTitleLabel as TitledPane handles title or we use a simple Label
+    private TableView<PitStopData> pitStopTableView;
+    private ObservableList<PitStopData> pitStopDataList; // Data source for TableView
+
+    // Race Summary Display
+    // Removed raceSummaryLabel, using statusLabel at the bottom instead
+
+    // Status/Summary Label (at the bottom)
+    private Label statusLabel; // Renamed from outputLabel for clarity in BorderPane.BOTTOM
 
     // Selected/Configured Objects
     private RaceCar selectedRaceCar;
@@ -77,75 +97,93 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Race Strategy Optimiser");
+        primaryStage.setWidth(1200); // Set initial width to at least 1200
+        primaryStage.setHeight(1000); // Set initial height to at least 700
 
         // Initialize Executor Service
         executorService = Executors.newSingleThreadExecutor();
 
-        // 1. Integrate Previous Data: Create instances of component variations
+        // 1. Integrate Previous Data: Create instances of game assets (components, tracks, conditions).
         initializeGameAssets();
+
+        // --- UI Layout ---
+
+        // Root Layout: BorderPane
+        BorderPane root = new BorderPane();
+        root.getStyleClass().add("root-pane"); // CSS class
+
+        // Top Section: Input Controls and Buttons (VBox for vertical arrangement)
+        VBox topPane = new VBox(10); // Use VBox for vertical arrangement, 10 pixels spacing
+        topPane.setPadding(new Insets(15));
+        topPane.setAlignment(Pos.TOP_LEFT); // Align items to the top left
 
         // 2. Input Controls: Create ComboBoxes and populate them
         engineComboBox = new ComboBox<>();
         engineComboBox.setItems(FXCollections.observableArrayList(engineVariations));
         engineComboBox.setPromptText("Select Engine");
+        engineComboBox.getStyleClass().add("component-combo-box"); // CSS class
+        engineComboBox.setMaxWidth(Double.MAX_VALUE); // Allow ComboBox to grow horizontally
 
         tyresComboBox = new ComboBox<>();
         tyresComboBox.setItems(FXCollections.observableArrayList(tyreVariations));
         tyresComboBox.setPromptText("Select Tyres");
+        tyresComboBox.getStyleClass().add("component-combo-box"); // CSS class
+        tyresComboBox.setMaxWidth(Double.MAX_VALUE); // Allow ComboBox to grow horizontally
 
         aeroKitComboBox = new ComboBox<>();
         aeroKitComboBox.setItems(FXCollections.observableArrayList(aeroKitVariations));
         aeroKitComboBox.setPromptText("Select Aerodynamic Kit");
+        aeroKitComboBox.getStyleClass().add("component-combo-box"); // CSS class
+        aeroKitComboBox.setMaxWidth(Double.MAX_VALUE); // Allow ComboBox to grow horizontally
 
         trackComboBox = new ComboBox<>();
         trackComboBox.setItems(FXCollections.observableArrayList(trackVariations));
         trackComboBox.setPromptText("Select Race Track");
+        trackComboBox.getStyleClass().add("race-detail-combo-box"); // CSS class
+        trackComboBox.setMaxWidth(Double.MAX_VALUE); // Allow ComboBox to grow horizontally
 
         conditionsComboBox = new ComboBox<>();
         conditionsComboBox.setItems(FXCollections.observableArrayList(conditionVariations));
         conditionsComboBox.setPromptText("Select Race Conditions");
+        conditionsComboBox.getStyleClass().add("race-detail-combo-box"); // CSS class
+        conditionsComboBox.setMaxWidth(Double.MAX_VALUE); // Allow ComboBox to grow horizontally
 
         carWeightField = new TextField("1000.0"); // Default value
         carWeightField.setPromptText("Car Weight (kg)");
+        carWeightField.setPrefWidth(100); // Set a preferred width
+        carWeightField.getStyleClass().add("input-field"); // CSS class
+        carWeightField.setMaxWidth(Double.MAX_VALUE); // Allow TextField to grow horizontally
+
 
         fuelTankCapacityField = new TextField("80.0"); // Default value
         fuelTankCapacityField.setPromptText("Fuel Tank Capacity (L)");
+        fuelTankCapacityField.setPrefWidth(120); // Set a preferred width
+        fuelTankCapacityField.getStyleClass().add("input-field"); // CSS class
+        fuelTankCapacityField.setMaxWidth(Double.MAX_VALUE); // Allow TextField to grow horizontally
 
 
         // 3. Action Buttons
         configureButton = new Button("Configure Car & Track");
         configureButton.setOnAction(e -> handleConfigureButton());
+        configureButton.getStyleClass().add("action-button"); // CSS class
+        configureButton.setMaxWidth(Double.MAX_VALUE); // Allow Button to grow horizontally
+
 
         startSimulationButton = new Button("Start Race Simulation");
         startSimulationButton.setOnAction(e -> handleStartSimulationButton());
-        startSimulationButton.setDisable(true); // Disabled until configuration is done
-
-        // 4. Car Stats Display
-        carStatsTitleLabel = new Label("--- Race Car Performance Stats ---");
-        topSpeedLabel = new Label("Top Speed: N/A");
-        accelerationLabel = new Label("0-100 km/h: N/A");
-        accelerationProfileLabel = new Label("Acceleration Profile: N/A");
-        handlingLabel = new Label("Handling (1-10): N/A");
-        corneringAbilityLabel = new Label("Cornering Ability (1-100): N/A");
-        fuelConsumptionLabel = new Label("Base Fuel Consumption (per lap): N/A");
-
-        // 5. Simulation Progress and Output
-        simulationTitleLabel = new Label("--- Race Simulation ---");
-        raceProgressBar = new ProgressBar(0);
-        raceProgressBar.setPrefWidth(300); // Make it wider
-        currentFuelLabel = new Label("Current Fuel: N/A");
-        currentTyreWearLabel = new Label("Current Tyre Wear: N/A");
-        raceLogTextArea = new TextArea();
-        raceLogTextArea.setEditable(false);
-        raceLogTextArea.setWrapText(true);
-        raceLogTextArea.setPrefHeight(200); // Give it some height
-        outputLabel = new Label("Select components and click 'Configure Car & Track'"); // Initialized outputLabel here
+        startSimulationButton.setDisable(true);
+        startSimulationButton.getStyleClass().add("action-button"); // CSS class
+        startSimulationButton.setMaxWidth(Double.MAX_VALUE); // Allow Button to grow horizontally
 
 
-        // 6. Layout: Arrange controls in a VBox
-        VBox root = new VBox(10); // 10 pixels spacing between children
-        root.setPadding(new Insets(15)); // Padding around the VBox
-        root.getChildren().addAll(
+        resetButton = new Button("Reset"); // Initialize Reset button
+        resetButton.setOnAction(e -> handleResetButton());
+        resetButton.getStyleClass().add("action-button"); // CSS class
+        resetButton.setMaxWidth(Double.MAX_VALUE); // Allow Button to grow horizontally
+
+
+        // Add controls to the topPane (VBox) in the specified vertical order
+        topPane.getChildren().addAll(
                 new Label("Select Car Components:"),
                 engineComboBox,
                 tyresComboBox,
@@ -157,24 +195,142 @@ public class Main extends Application {
                 trackComboBox,
                 conditionsComboBox,
                 configureButton,
-                carStatsTitleLabel,
+                startSimulationButton, // Moved start button here
+                resetButton // Moved reset button here
+        );
+        root.setTop(topPane);
+
+
+        // Center Section: HBox with three VBox panels (remains the same for parallel display)
+        HBox centerContentPane = new HBox(15); // 15 pixels spacing between panels
+        centerContentPane.setPadding(new Insets(0, 15, 0, 15)); // Add horizontal padding
+        centerContentPane.setAlignment(Pos.TOP_CENTER); // Align panels to the top
+        BorderPane.setMargin(centerContentPane, new Insets(15, 0, 15, 0)); // Add vertical margin to center pane
+
+
+        // Panel 1: Race Car Performance Stats (VBox)
+        VBox statsPane = new VBox(5); // 5 pixels spacing within the panel
+        statsPane.getStyleClass().add("info-panel"); // Apply panel styling
+        HBox.setHgrow(statsPane, Priority.ALWAYS); // Allow stats pane to grow horizontally
+        VBox.setVgrow(statsPane, Priority.ALWAYS); // Allow stats pane to grow vertically
+
+        Label statsTitleLabel = new Label("Race Car Performance Stats"); // Title Label
+        statsTitleLabel.getStyleClass().add("section-title"); // Apply title styling
+
+        // 4. Car Stats Display - Initialize labels
+        topSpeedLabel = new Label("Top Speed: N/A");
+        accelerationLabel = new Label("0-100 km/h: N/A");
+        accelerationProfileLabel = new Label("Acceleration Profile: N/A");
+        handlingLabel = new Label("Handling (1-10): N/A");
+        corneringAbilityLabel = new Label("Cornering Ability (1-100): N/A");
+        fuelConsumptionLabel = new Label("Base Fuel Consumption (per lap): N/A");
+        fuelTankCapacityDisplayLabel = new Label("Fuel Tank Capacity: N/A"); // Display from car object
+        carWeightDisplayLabel = new Label("Car Weight: N/A"); // Display from car object
+
+
+        statsPane.getChildren().addAll(
+                statsTitleLabel,
                 topSpeedLabel,
                 accelerationLabel,
                 accelerationProfileLabel,
                 handlingLabel,
                 corneringAbilityLabel,
                 fuelConsumptionLabel,
-                simulationTitleLabel,
-                startSimulationButton,
+                fuelTankCapacityDisplayLabel,
+                carWeightDisplayLabel
+        );
+
+
+        // Panel 2: Race Simulation Log (VBox)
+        VBox logPane = new VBox(5);
+        logPane.getStyleClass().add("info-panel"); // Apply panel styling
+        HBox.setHgrow(logPane, Priority.ALWAYS); // Allow log pane to grow horizontally
+        VBox.setVgrow(logPane, Priority.ALWAYS); // Allow log pane to grow vertically
+
+
+        Label logTitleLabel = new Label("Race Simulation Log"); // Title Label
+        logTitleLabel.getStyleClass().add("section-title"); // Apply title styling
+
+        // 5. Simulation Progress and Output - Initialize controls
+        raceProgressBar = new ProgressBar(0);
+        raceProgressBar.setMaxWidth(Double.MAX_VALUE); // Make it fill width
+        currentFuelLabel = new Label("Current Fuel: N/A");
+        currentTyreWearLabel = new Label("Current Tyre Wear: N/A");
+        raceLogTextArea = new TextArea();
+        raceLogTextArea.setEditable(false);
+        raceLogTextArea.setWrapText(true);
+        // raceLogTextArea.setPrefHeight(150); // Removed fixed height
+        raceLogTextArea.getStyleClass().add("log-area"); // CSS class
+        VBox.setVgrow(raceLogTextArea, Priority.ALWAYS); // Make TextArea grow vertically
+
+        logPane.getChildren().addAll(
+                logTitleLabel,
                 raceProgressBar,
                 currentFuelLabel,
                 currentTyreWearLabel,
-                raceLogTextArea,
-                outputLabel // Added outputLabel to the layout
+                raceLogTextArea
         );
 
+
+        // Panel 3: Pit Stops (VBox)
+        VBox pitStopsPane = new VBox(5);
+        pitStopsPane.getStyleClass().add("info-panel"); // Apply panel styling
+        HBox.setHgrow(pitStopsPane, Priority.ALWAYS); // Allow pit stops pane to grow horizontally
+        VBox.setVgrow(pitStopsPane, Priority.ALWAYS); // Allow pit stops pane to grow vertically
+
+
+        Label pitStopsTitleLabel = new Label("Pit Stops"); // Title Label
+        pitStopsTitleLabel.getStyleClass().add("section-title"); // Apply title styling
+
+        // 6. Pit Stop Display (TableView) - Initialize TableView
+        pitStopTableView = new TableView<>();
+        pitStopDataList = FXCollections.observableArrayList();
+        pitStopTableView.setItems(pitStopDataList);
+        pitStopTableView.setPlaceholder(new Label("No pit stops planned or taken yet.")); // Message when empty
+        // pitStopTableView.setPrefHeight(150); // Removed fixed height
+
+        TableColumn<PitStopData, Integer> lapColumn = new TableColumn<>("Lap Number");
+        lapColumn.setCellValueFactory(new PropertyValueFactory<>("lapNumber"));
+        lapColumn.setPrefWidth(100); // Adjust width as needed
+        // lapColumn.setResizable(false); // Optional: Prevent resizing
+
+        TableColumn<PitStopData, String> reasonColumn = new TableColumn<>("Reason for Pit Stop");
+        reasonColumn.setCellValueFactory(new PropertyValueFactory<>("reason"));
+        reasonColumn.setPrefWidth(200); // Adjust width as needed
+        // reasonColumn.setResizable(false); // Optional: Prevent resizing
+
+        // Adjust column resize policy to distribute extra space
+        pitStopTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        pitStopTableView.getColumns().addAll(lapColumn, reasonColumn); // Add columns
+        pitStopTableView.getStyleClass().add("pit-stop-table"); // CSS class
+        VBox.setVgrow(pitStopTableView, Priority.ALWAYS); // Make TableView grow vertically
+
+
+        pitStopsPane.getChildren().addAll(
+                pitStopsTitleLabel,
+                pitStopTableView
+        );
+
+
+        // Add the three VBox panels to the HBox
+        centerContentPane.getChildren().addAll(statsPane, logPane, pitStopsPane);
+        root.setCenter(centerContentPane);
+
+
+        // Bottom Section: Status Label (BorderPane.BOTTOM)
+        // 7. Race Summary Display - Removed raceSummaryLabel
+        // 8. Layout - Removed old VBox root setup
+        statusLabel = new Label("Select components and click 'Configure Car & Track'"); // Renamed from outputLabel
+        statusLabel.getStyleClass().add("status-label");
+        BorderPane.setMargin(statusLabel, new Insets(0, 15, 15, 15)); // Add margin
+        root.setBottom(statusLabel);
+
+
         // Set up the Scene and Stage
-        Scene scene = new Scene(root, 450, 750); // Adjusted window size to fit outputLabel
+        Scene scene = new Scene(root); // Scene size is now determined by Stage size
+        // Link the CSS file
+        scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -218,6 +374,7 @@ public class Main extends Application {
     /**
      * Handles the action when the Configure Car & Track button is clicked.
      * Creates the RaceCar instance and displays its stats.
+     * Also calculates and displays the initial pit stop strategy.
      */
     private void handleConfigureButton() {
         Engine selectedEngine = engineComboBox.getSelectionModel().getSelectedItem();
@@ -236,8 +393,11 @@ public class Main extends Application {
                  throw new NumberFormatException("Values must be positive.");
             }
         } catch (NumberFormatException e) {
-            outputLabel.setText("Invalid input for Car Weight or Fuel Tank Capacity: " + e.getMessage());
+            showErrorAlert("Invalid Input", "Please enter valid positive numbers for Car Weight and Fuel Tank Capacity.");
+            statusLabel.setText("Configuration failed: Invalid input."); // Use statusLabel
             clearCarStats();
+            clearPitStops();
+            // raceSummaryLabel.setText("Race Summary: N/A"); // Removed raceSummaryLabel
             startSimulationButton.setDisable(true);
             return;
         }
@@ -256,15 +416,32 @@ public class Main extends Application {
             handlingLabel.setText(String.format("Handling (1-10): %d/10", selectedRaceCar.getHandlingRating()));
             corneringAbilityLabel.setText(String.format("Cornering Ability (1-100): %d/100", selectedRaceCar.getCorneringAbilityRating()));
             fuelConsumptionLabel.setText(String.format("Base Fuel Consumption (per lap): %.2f L", selectedRaceCar.getBaseFuelConsumptionPerLap()));
+            fuelTankCapacityDisplayLabel.setText(String.format("Fuel Tank Capacity: %.1f L", selectedRaceCar.getFuelTankCapacity())); // Display from car object
+            carWeightDisplayLabel.setText(String.format("Car Weight: %.1f kg", selectedRaceCar.getCarWeight())); // Display from car object
+
+
+            // Calculate and display planned pit stops (using a temporary optimiser instance)
+            RaceStrategyOptimiser tempOptimiser = new RaceStrategyOptimiser(
+                new RaceCar(selectedEngine, selectedTyres, selectedAeroKit, carWeight, fuelTankCapacity), // Use a copy for planning
+                selectedRaceTrack,
+                selectedRaceConditions
+            );
+            List<Integer> plannedPitLaps = tempOptimiser.planPitStops();
+            displayPlannedPitStops(plannedPitLaps);
+
 
             // Enable simulation button
             startSimulationButton.setDisable(false);
             raceLogTextArea.clear(); // Clear previous log
-            outputLabel.setText("Configuration successful. Ready to simulate.");
+            // raceSummaryLabel.setText("Race Summary: N/A"); // Removed raceSummaryLabel
+            statusLabel.setText("Configuration successful. Ready to simulate."); // Use statusLabel
 
         } else {
-            outputLabel.setText("Please select all components, track, and conditions.");
+            showErrorAlert("Selection Error", "Please select all components, track, and conditions.");
+            statusLabel.setText("Configuration failed: Missing selections."); // Use statusLabel
             clearCarStats();
+            clearPitStops();
+            // raceSummaryLabel.setText("Race Summary: N/A"); // Removed raceSummaryLabel
             startSimulationButton.setDisable(true);
         }
     }
@@ -279,6 +456,36 @@ public class Main extends Application {
         handlingLabel.setText("Handling (1-10): N/A");
         corneringAbilityLabel.setText("Cornering Ability (1-100): N/A");
         fuelConsumptionLabel.setText("Base Fuel Consumption (per lap): N/A");
+        fuelTankCapacityDisplayLabel.setText("Fuel Tank Capacity: N/A");
+        carWeightDisplayLabel.setText("Car Weight: N/A");
+    }
+
+    /**
+     * Displays the planned pit stops in the TableView.
+     * @param plannedLaps The list of lap numbers for planned pit stops.
+     */
+    private void displayPlannedPitStops(List<Integer> plannedLaps) {
+        pitStopDataList.clear(); // Clear previous data
+        if (plannedLaps.isEmpty()) {
+            pitStopTableView.setPlaceholder(new Label("No pit stops planned by the initial strategy."));
+        } else {
+            pitStopTableView.setPlaceholder(new Label("")); // Clear placeholder if data exists
+            for (int lap : plannedLaps) {
+                // For planned stops, we don't have a specific reason yet from planPitStops()
+                // A more advanced optimiser would provide this. For now, use a generic reason.
+                 pitStopDataList.add(new PitStopData(lap, "Planned"));
+            }
+        }
+        pitStopTableView.refresh(); // Refresh TableView after updating data
+    }
+
+     /**
+      * Clears the pit stop TableView.
+      */
+    private void clearPitStops() {
+        pitStopDataList.clear();
+        pitStopTableView.setPlaceholder(new Label("No pit stops planned or taken yet."));
+        pitStopTableView.refresh(); // Refresh TableView after clearing
     }
 
 
@@ -288,34 +495,46 @@ public class Main extends Application {
      */
     private void handleStartSimulationButton() {
         if (selectedRaceCar == null || selectedRaceTrack == null || selectedRaceConditions == null) {
-            outputLabel.setText("Please configure car and track first.");
+            showErrorAlert("Simulation Error", "Please configure car and track first.");
+            statusLabel.setText("Simulation failed: Not configured."); // Use statusLabel
             return;
         }
 
         // Disable buttons during simulation
         configureButton.setDisable(true);
         startSimulationButton.setDisable(true);
+        resetButton.setDisable(true); // Disable reset during simulation
 
         // Reset car state for simulation
         selectedRaceCar.setCurrentFuel(selectedRaceCar.getFuelTankCapacity());
         selectedRaceCar.setCurrentTyreWear(0.0);
 
-        // Clear previous simulation output
+        // Clear previous simulation output and pit stops
         raceLogTextArea.clear();
+        pitStopDataList.clear(); // Clear planned stops, will add actual stops
+        pitStopTableView.refresh();
+        pitStopTableView.setPlaceholder(new Label("Simulating race...")); // Update placeholder
+        // raceSummaryLabel.setText("Race Summary: Simulating..."); // Removed raceSummaryLabel
         raceProgressBar.setProgress(0);
         currentFuelLabel.setText("Current Fuel: " + String.format("%.2f L", selectedRaceCar.getCurrentFuel()));
         currentTyreWearLabel.setText("Current Tyre Wear: " + String.format("%.2f%%", selectedRaceCar.getCurrentTyreWear() * 100));
-        outputLabel.setText("Simulation started...");
+        statusLabel.setText("Simulation started..."); // Use statusLabel
+
 
         // Create RaceStrategyOptimiser for simulation logic (specifically simulateLap)
+        // Note: The optimiser instance itself doesn't need to be recreated if car/track/conditions haven't changed,
+        // but we need its simulateLap method. We can reuse the instance or create a new one.
+        // Creating a new one ensures it starts with the current state of selectedRaceCar.
         raceOptimiser = new RaceStrategyOptimiser(selectedRaceCar, selectedRaceTrack, selectedRaceConditions);
+
 
         // Create a Task for the background simulation
         Task<Void> simulationTask = new Task<Void>() {
+            private int pitStopCount = 0; // Counter for pit stops taken
+
             @Override
             protected Void call() throws Exception {
                 int totalLaps = selectedRaceTrack.getNumberOfLaps();
-                // Accessing the public static final constant
                 double maxTyreWearThreshold = RaceStrategyOptimiser.MAX_TYRE_WEAR_THRESHOLD;
 
                 for (int completedLap = 0; completedLap < totalLaps; completedLap++) {
@@ -335,7 +554,7 @@ public class Main extends Application {
                     });
 
                     // --- Pit Stop Decision AFTER the lap (based on state AFTER this lap, for the NEXT lap) ---
-                    if (currentLapNumber < totalLaps) { // No pit stop after the final lap
+                    if (currentLapNumber < totalLaps) { // No pit stop decision after the final lap
                          double fuelNeededForNextLap = selectedRaceCar.getBaseFuelConsumptionPerLap() * selectedRaceTrack.getFuelConsumptionFactor();
                          boolean pitForFuel = selectedRaceCar.getCurrentFuel() < fuelNeededForNextLap;
                          boolean pitForTyres = selectedRaceCar.getCurrentTyreWear() >= maxTyreWearThreshold;
@@ -344,6 +563,7 @@ public class Main extends Application {
                              // Perform pit stop actions
                              selectedRaceCar.setCurrentFuel(selectedRaceCar.getFuelTankCapacity()); // Refuel
                              selectedRaceCar.setCurrentTyreWear(0.0); // Change tyres
+                             pitStopCount++; // Increment pit stop counter
 
                              Platform.runLater(() -> {
                                  String reason = "";
@@ -351,6 +571,9 @@ public class Main extends Application {
                                  else if (pitForFuel) reason = "Fuel";
                                  else if (pitForTyres) reason = "Tyres";
                                  raceLogTextArea.appendText(String.format("--- Pit Stop at end of Lap %d (%s) ---\n", lap, reason));
+                                 pitStopDataList.add(new PitStopData(lap, reason)); // Add actual pit stop to TableView
+                                 pitStopTableView.setPlaceholder(new Label("")); // Clear placeholder if first pit stop
+                                 pitStopTableView.refresh();
                                  currentFuelLabel.setText("Current Fuel: " + String.format("%.2f L", selectedRaceCar.getCurrentFuel())); // Update UI immediately after pit
                                  currentTyreWearLabel.setText("Current Tyre Wear: " + String.format("%.2f%%", selectedRaceCar.getCurrentTyreWear() * 100));
                              });
@@ -362,8 +585,15 @@ public class Main extends Application {
 
 
                     // Add a small delay to visualize progress
-                    Thread.sleep(100); // Simulate lap time
+                    Thread.sleep(50); // Simulate lap time (reduced for faster simulation)
                 }
+
+                // Simulation finished, update summary
+                Platform.runLater(() -> {
+                    statusLabel.setText(String.format("Race Finished! Total Pit Stops: %d. Final Fuel: %.2f L, Final Tyres: %.2f%% wear.",
+                            pitStopCount, selectedRaceCar.getCurrentFuel(), selectedRaceCar.getCurrentTyreWear() * 100)); // Use statusLabel
+                });
+
 
                 return null; // Task completed
             }
@@ -372,17 +602,21 @@ public class Main extends Application {
         // Handle task completion
         simulationTask.setOnSucceeded(event -> {
             Platform.runLater(() -> {
-                outputLabel.setText("Race Finished!");
+                statusLabel.setText("Race Simulation Complete!"); // Use statusLabel
                 configureButton.setDisable(false);
-                // startSimulationButton remains disabled until re-configuration or reset (if implemented later)
+                // startSimulationButton remains disabled until re-configuration or reset
+                resetButton.setDisable(false); // Enable reset after simulation
+                pitStopTableView.refresh();
             });
         });
 
         simulationTask.setOnFailed(event -> {
              Platform.runLater(() -> {
-                 outputLabel.setText("Simulation failed: " + simulationTask.getException().getMessage());
+                 statusLabel.setText("Simulation failed: " + simulationTask.getException().getMessage()); // Use statusLabel
                  configureButton.setDisable(false);
                  // startSimulationButton remains disabled
+                 resetButton.setDisable(false); // Enable reset after simulation
+                 pitStopTableView.refresh();
              });
         });
 
@@ -390,6 +624,57 @@ public class Main extends Application {
         // Run the task in the background
         executorService.execute(simulationTask);
     }
+
+    /**
+     * Handles the action when the Reset button is clicked.
+     * Clears the UI and resets the state.
+     */
+    private void handleResetButton() {
+        // Reset input controls
+        engineComboBox.getSelectionModel().clearSelection();
+        tyresComboBox.getSelectionModel().clearSelection();
+        aeroKitComboBox.getSelectionModel().clearSelection();
+        trackComboBox.getSelectionModel().clearSelection();
+        conditionsComboBox.getSelectionModel().clearSelection();
+        carWeightField.setText("1000.0");
+        fuelTankCapacityField.setText("80.0");
+
+        // Clear displayed stats and simulation info
+        clearCarStats();
+        raceLogTextArea.clear();
+        raceProgressBar.setProgress(0);
+        currentFuelLabel.setText("Current Fuel: N/A");
+        currentTyreWearLabel.setText("Current Tyre Wear: N/A");
+        clearPitStops();
+        // raceSummaryLabel.setText("Race Summary: N/A"); // Removed raceSummaryLabel
+        statusLabel.setText("Application reset. Select components to begin."); // Use statusLabel
+
+        // Reset internal state
+        selectedRaceCar = null;
+        selectedRaceTrack = null;
+        selectedRaceConditions = null;
+        raceOptimiser = null;
+
+        // Reset button states
+        configureButton.setDisable(false);
+        startSimulationButton.setDisable(true);
+        resetButton.setDisable(false); // Reset button is always enabled after reset
+    }
+
+
+    /**
+     * Displays an error alert dialog.
+     * @param title The title of the alert.
+     * @param message The message to display.
+     */
+    private void showErrorAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null); // No header text
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
 
     @Override
     public void stop() throws Exception {

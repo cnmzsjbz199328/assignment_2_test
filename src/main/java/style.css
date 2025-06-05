@@ -1,0 +1,96 @@
+.root-pane {
+    -fx-background-color: #f4f4f4; /* Light grey background */
+}
+
+.label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #333; /* Dark grey text */
+}
+
+.section-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #555; /* Slightly darker grey */
+    -fx-padding: 10px 0 5px 0; /* Add some vertical padding */
+}
+
+.combo-box, .text-field {
+    -fx-font-size: 12px;
+}
+
+.action-button {
+    -fx-background-color: #0078d7; /* Microsoft blue */
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 5px 15px;
+    -fx-background-radius: 3;
+}
+
+.action-button:hover {
+    -fx-background-color: #005a9e; /* Darker blue on hover */
+}
+
+.action-button:disabled {
+    -fx-background-color: #cccccc; /* Grey when disabled */
+}
+
+.status-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #0078d7; /* Blue for status messages */
+    -fx-padding: 5px 0 0 0; /* Add padding above */
+}
+
+.log-area {
+    -fx-font-family: "Consolas", "Monospaced"; /* Monospaced font for log */
+    -fx-font-size: 11px;
+    -fx-text-fill: #000;
+    -fx-control-inner-background: #e9e9e9; /* Light background */
+}
+
+.pit-stop-table {
+    -fx-font-size: 11px;
+}
+
+.pit-stop-table .column-header {
+    -fx-background-color: #ddd; /* Light grey header */
+    -fx-font-weight: bold;
+}
+
+.summary-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #107c10; /* Green for success/summary */
+    -fx-padding: 10px 0 0 0;
+}
+
+/* Optional: Style specific combo boxes if needed */
+.component-combo-box {
+    /* Specific styles for component comboboxes */
+}
+
+.race-detail-combo-box {
+    /* Specific styles for race detail comboboxes */
+}
+
+.input-field {
+     /* Specific styles for text fields */
+}
+
+/* New styles for layout elements */
+.info-panel {
+    -fx-background-color: #ffffff; /* White background for info panels */
+    -fx-border-color: #ccc; /* Light grey border */
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-padding: 10px;
+}
+
+.section-titled-pane .title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+}
+
+.split-pane-divider {
+    -fx-background-color: #ccc; /* Style for split pane dividers */
+}
