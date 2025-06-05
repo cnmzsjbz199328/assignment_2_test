@@ -163,14 +163,17 @@ Okay, here is the English version of Prompt 13:
 *   **Role:** UI/UX Designer.
 *   **Task:** Adjust the application's window dimensions and the layout of the core information display areas to make it more spacious, visually clear, and with parallel information display.
 *   **Requirements:**
-    *   **Initial Window Size:** Set the `primaryStage`'s initial width to at least `1200px` and its height to at least `700px`.
-    *   **Main Content Area Layout:**
+    *   **Initial Window Size:** Set the `primaryStage`'s initial width to at least `1200px` and its height to at least `1000px`.
+    *   **Overall Layout:** Use a `BorderPane` as the root layout.
+    *   **Top Region Layout:** Place the input controls (`ComboBoxes`, `TextFields`) and action buttons (`Configure`, `Start Simulation`, `Reset`) in the `TOP` region of the `BorderPane`. Arrange these controls vertically within a `VBox`.
+    *   **Center Region Layout:**
         *   Within the `CENTER` region of the `BorderPane`, use an `HBox` as the primary container.
         *   Inside this `HBox`, place three main display areas side-by-side:
             1.  **Race Car Performance Stats:** This `VBox` should contain the `RaceCar`'s performance metrics (e.g., `top_speed`, `acceleration_time_0_100`, etc.). Add a clear title `Label` for this section (e.g., "Race Car Performance").
             2.  **Race Simulation Log:** This area should contain the `TextArea` or `ListView` for the lap-by-lap simulation log. Add a clear title `Label` for this section (e.g., "Race Log"). Ensure the `TextArea` or `ListView` can fully utilize the vertical space available in its section.
             3.  **Pit Stop Records:** This area should contain the `TableView` displaying pit stop information. Add a clear title `Label` for this section (e.g., "Pit Stops"). Ensure the `TableView` can fully utilize the vertical space available in its section.
         *   Add appropriate `spacing` and `padding` to the `HBox` and its internal `VBox` elements to provide better visual separation and readability.
+    *   **Bottom Region Layout:** Place a `Label` (e.g., `statusLabel`) in the `BOTTOM` region of the `BorderPane` for status and summary messages.
     *   **Increased Area Height:** Ensure the three parallel areas (Performance Stats, Simulation Log, Pit Stops) collectively occupy most of the `CENTER` region's vertical space, and allow their internal `TextArea` and `TableView` to expand vertically.
-    *   **User-Friendliness:** Maintain or improve the layout of existing input controls (`ComboBoxes` and buttons), ensuring they remain easily accessible within the new, wider window. Confirm that all existing functionalities (threaded simulation, real-time updates, etc.) still work correctly.
-*   **Instructions:** Update the `start` method within your `Main` class. The primary changes will involve configuring the `Scene`'s root layout and the layout within the `CENTER` region. You might need to adjust the `prefHeight` of the `TextArea` and `TableView` or use `VBox.setVgrow(component, Priority.ALWAYS)` to ensure they expand vertically as desired. Also, consider making minor adjustments to your `style.css` file to complement the new layout.
+    *   **User-Friendliness:** Ensure all input controls and buttons remain easily accessible within the new, wider window. Confirm that all existing functionalities (threaded simulation, real-time updates, etc.) still work correctly.
+*   **Instructions:** Update the `start` method within your `Main` class. The primary changes will involve configuring the `Scene`'s root layout and the layout within the `TOP` and `CENTER` regions. You might need to adjust the `prefHeight` of the `TextArea` and `TableView` or use `VBox.setVgrow(component, Priority.ALWAYS)` to ensure they expand vertically as desired. Also, consider making minor adjustments to your `style.css` file to complement the new layout.
