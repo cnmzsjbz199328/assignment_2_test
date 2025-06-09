@@ -154,10 +154,6 @@
     *   Reset Functionality (Optional but recommended): Add a "Reset" button to clear the UI and allow a new simulation.
 *   **Instructions:** Provide the updated `Main` class incorporating the `TableView` and summary display. Also, include the content of a basic `style.css` file. Ensure that the `TableView` correctly reflects the pit stop strategy and events during the simulation.
 
-Okay, here is the English version of Prompt 13:
-
----
-
 **Prompt 13: JavaFX Application - Optimized Layout & Sizing**
 
 *   **Role:** UI/UX Designer.
@@ -177,3 +173,22 @@ Okay, here is the English version of Prompt 13:
     *   **Increased Area Height:** Ensure the three parallel areas (Performance Stats, Simulation Log, Pit Stops) collectively occupy most of the `CENTER` region's vertical space, and allow their internal `TextArea` and `TableView` to expand vertically.
     *   **User-Friendliness:** Ensure all input controls and buttons remain easily accessible within the new, wider window. Confirm that all existing functionalities (threaded simulation, real-time updates, etc.) still work correctly.
 *   **Instructions:** Update the `start` method within your `Main` class. The primary changes will involve configuring the `Scene`'s root layout and the layout within the `TOP` and `CENTER` regions. You might need to adjust the `prefHeight` of the `TextArea` and `TableView` or use `VBox.setVgrow(component, Priority.ALWAYS)` to ensure they expand vertically as desired. Also, consider making minor adjustments to your `style.css` file to complement the new layout.
+
+**Prompt 14: Refactoring Main Class for Modularity**
+*   **Role:** Act as a Software Architect & UI Orchestration Specialist.
+*   **Task:** Refactor the `Main` class to enhance its modularity and adhere more strictly to the Single Responsibility Principle. Extract the core logic of asset provision and race simulation into new, standalone `.java` files within the same `racesimulation` package.
+*   **Requirements:**
+    *   **Zero Modification of Existing Classes:** Do not alter any existing model or strategy class files (e.g., `Engine.java`, `Tyres.java`, `RaceCar.java`, `RaceStrategyOptimiser.java`, etc.). Use their methods and properties as-is.
+    *   **No New Top-Level Packages:** All new `.java` files created (`GameAssetProvider.java`, `RaceSimulationTask.java`) must reside directly within the `racesimulation` package.
+    *   **Extract Asset Provision:** Create a new class `racesimulation/GameAssetProvider.java`. Move the entire asset initialization logic (populating `engineVariations`, `tyreVariations`, etc. lists) from `Main`'s original `initializeGameAssets()` method into the constructor or a dedicated method within `GameAssetProvider`. `GameAssetProvider` must provide public getter methods (e.g., `getEngineVariations()`, `getTyreVariations()`) to retrieve these pre-configured lists. `Main` will instantiate `GameAssetProvider` once and use its getters to populate its `ComboBox` components.
+    *   **Extract Simulation Task:** Create a new class `racesimulation/RaceSimulationTask.java`, which extends `javafx.concurrent.Task<Void>`. Move the entire simulation loop logic (the `call()` method content, including the per-lap processing, fuel/tyre updates, pit stop decisions, and `Thread.sleep` calls) from `Main`'s `handleStartSimulationButton`'s internal `Task` into this `RaceSimulationTask` class. `RaceSimulationTask` should not hold direct references to any JavaFX UI components (e.g., `Label`, `ProgressBar`, `TextArea`).
+    *   **Communication via Callbacks:** `RaceSimulationTask` must accept standard Java functional interfaces (e.g., `java.util.function.Consumer<T>`, `java.util.function.BiConsumer<T, U>`) in its constructor to provide updates back to `Main`. These callbacks will include:
+        *   `Consumer<String> logMessageConsumer`: For appending messages to the race log `TextArea`.
+        *   `Consumer<Double> updateFuelConsumer`: For updating the current fuel `Label`.
+        *   `Consumer<Double> updateTyreWearConsumer`: For updating the current tyre wear `Label`.
+        *   `BiConsumer<Integer, String> addPitStopConsumer`: For adding entries to the pit stop `TableView`.
+        *   `Consumer<Double> updateProgressConsumer`: For updating the race `ProgressBar`.
+        *   `Consumer<String> simulationFinishedConsumer`: For updating the status `Label` with the final summary.
+    *   `RaceSimulationTask` will be passed all necessary model instances (`RaceCar`, `RaceTrack`, `RaceConditions`, `RaceStrategyOptimiser`) via its constructor.
+    *   **Refocus Main Class:** `Main.start()` will primarily focus on building the UI scene graph and initializing `GameAssetProvider` and `ExecutorService`. `Main.handleConfigureButton()` remains responsible for reading user inputs, constructing `RaceCar`, and calling `RaceStrategyOptimiser.planPitStops()`. It will then update UI elements based on the car's derived stats and the planned pit stops. `Main.handleStartSimulationButton()` will instantiate `RaceSimulationTask`, passing in the selected `RaceCar`, `RaceTrack`, `RaceConditions`, `RaceStrategyOptimiser`, and all the necessary UI update callbacks (each wrapped in `Platform.runLater` to ensure thread safety). It will then submit this task to the `executorService`. All UI-specific helper methods (e.g., `clearCarStats`, `displayPlannedPitStops`) should remain private methods within `Main`. `Main` will handle the `setOnSucceeded` and `setOnFailed` events of the `RaceSimulationTask` to update UI state after the task completes.
+*   **Instructions:** Provide the complete, updated `Main.java` class. Provide the complete code for the new `GameAssetProvider.java` class. Provide the complete code for the new `RaceSimulationTask.java` class. Confirm that `style.css` remains unchanged. You do not need to provide any other `.java` files (e.g., `Engine.java`, `RaceCar.java`, `RaceStrategyOptimiser.java`), as they are explicitly out of scope for modification.
