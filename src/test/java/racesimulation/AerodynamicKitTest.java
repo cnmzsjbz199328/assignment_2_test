@@ -27,37 +27,37 @@ class AerodynamicKitTest {
                 () -> assertEquals(20.00, aeroKitTestOne.getDragCoefficient()),
                 () -> assertEquals(3, aeroKitTestOne.getDownforceValue()),
                 () -> assertEquals(1.0, aeroKitTestOne.getImpactOnTopSpeed()),
-                () -> assertEquals(1.2,aeroKitTestOne.getImpactOnCornering())
+                () -> assertEquals(1.2, aeroKitTestOne.getImpactOnCornering())
         );
     }
 
     @DisplayName("WB_ADKT_02: Test getter method for Kit Name. (Criticality: Core)")
     @Test
-    public void getKitName() {
+    public void testGetterKitName() {
         assertEquals("Testing", aeroKitTestTwo.getKitName());
     }
 
     @DisplayName("WB_ADKT_03: Test getter method for Drag Coefficient. (Criticality: Core)")
     @Test
-    public void getDragCoefficient() {
+    public void testGetterDragCoefficient() {
         assertEquals(10.00, aeroKitTestTwo.getDragCoefficient());
     }
 
     @DisplayName("WB_ADKT_04: Test getter method for Downforce Value. (Criticality: Core)")
     @Test
-    public void getDownforceValue() {
+    public void testGetterDownforceValue() {
         assertEquals(4, aeroKitTestTwo.getDownforceValue());
     }
 
     @DisplayName("WB_ADKT_05: Test getter method for Impact On Top Speed. (Criticality: Core)")
     @Test
-    public void getImpactOnTopSpeed() {
+    public void testGetterImpactOnTopSpeed() {
         assertEquals(0.8, aeroKitTestTwo.getImpactOnTopSpeed());
     }
 
     @DisplayName("WB_ADKT_06: Test getter method for Impact On Cornering. (Criticality: Core)")
     @Test
-    public void getImpactOnCornering() {
+    public void testGetterImpactOnCornering() {
         assertEquals(1.0, aeroKitTestTwo.getImpactOnCornering());
     }
 
