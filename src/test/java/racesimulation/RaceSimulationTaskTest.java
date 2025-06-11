@@ -24,6 +24,7 @@ class RaceSimulationTaskTest {
     RaceConditions raceConditions = new RaceConditions("sunny", 10, 10);
     RaceStrategyOptimiser raceStrategyOptimiser = new RaceStrategyOptimiser(raceCar, raceTrack, raceConditions);
 
+    // GUI related??
     Consumer<String> logMessageConsumer;
     Consumer<Double> updateFuelConsumer;
     Consumer<Double> updateTyreWearConsumer;

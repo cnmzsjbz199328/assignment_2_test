@@ -22,8 +22,6 @@ class RaceStrategyOptimiserTest {
     static RaceConditions raceConditions;
     static RaceStrategyOptimiser raceStrategyOptimiser;
 
-
-
     @BeforeEach
     void setup() {
         raceCar = new RaceCar(
