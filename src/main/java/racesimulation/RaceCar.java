@@ -19,12 +19,16 @@ class RaceCar {
     private int corneringAbilityRating;     // 1-100
     private double baseFuelConsumptionPerLap; // liters
 
+    // Preset allowed values for car weight and fuel tank capacity
+    public static final java.util.List<Double> ALLOWED_WEIGHTS = java.util.Arrays.asList(900.0, 1000.0, 1100.0);
+    public static final java.util.List<Double> ALLOWED_FUEL_CAPACITIES = java.util.Arrays.asList(60.0, 70.0, 80.0);
+
     public RaceCar(Engine engine, Tyres tyres, AerodynamicKit aeroKit, double carWeight, double fuelTankCapacity) {
-        if (carWeight <= 0) {
-            throw new IllegalArgumentException("Car weight must be positive.");
+        if (!ALLOWED_WEIGHTS.contains(carWeight)) {
+            throw new IllegalArgumentException("Car weight must be one of the allowed preset values: " + ALLOWED_WEIGHTS);
         }
-        if (fuelTankCapacity <= 0) {
-            throw new IllegalArgumentException("Fuel tank capacity must be positive.");
+        if (!ALLOWED_FUEL_CAPACITIES.contains(fuelTankCapacity)) {
+            throw new IllegalArgumentException("Fuel tank capacity must be one of the allowed preset values: " + ALLOWED_FUEL_CAPACITIES);
         }
         this.engine = engine;
         this.tyres = tyres;
@@ -107,6 +111,14 @@ class RaceCar {
 
     public double getBaseFuelConsumptionPerLap() {
         return baseFuelConsumptionPerLap;
+    }
+
+    // Helper methods for UI integration
+    public static java.util.List<Double> getAllowedWeights() {
+        return ALLOWED_WEIGHTS;
+    }
+    public static java.util.List<Double> getAllowedFuelCapacities() {
+        return ALLOWED_FUEL_CAPACITIES;
     }
 
     private double calculateTopSpeed() {

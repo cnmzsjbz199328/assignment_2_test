@@ -39,8 +39,8 @@ public class Main extends Application {
     private ComboBox<AerodynamicKit> aeroKitComboBox;
     private ComboBox<RaceTrack> trackComboBox;
     private ComboBox<RaceConditions> conditionsComboBox;
-    private TextField carWeightField;
-    private TextField fuelTankCapacityField;
+    private ComboBox<Double> carWeightComboBox;
+    private ComboBox<Double> fuelTankCapacityComboBox;
 
     // Action Buttons
     private Button configureButton;
@@ -138,19 +138,15 @@ public class Main extends Application {
         conditionsComboBox.getStyleClass().add("race-detail-combo-box");
         conditionsComboBox.setMaxWidth(Double.MAX_VALUE);
 
-        carWeightField = new TextField("1000.0");
-        carWeightField.setPromptText("Car Weight (kg)");
-        carWeightField.setPrefWidth(100);
-        carWeightField.getStyleClass().add("input-field");
-        carWeightField.setMaxWidth(Double.MAX_VALUE);
+        carWeightComboBox = new ComboBox<>();
+        carWeightComboBox.setItems(FXCollections.observableArrayList(RaceCar.getAllowedWeights()));
+        carWeightComboBox.setPromptText("Select Car Weight (kg)");
+        carWeightComboBox.setMaxWidth(Double.MAX_VALUE);
 
-
-        fuelTankCapacityField = new TextField("80.0");
-        fuelTankCapacityField.setPromptText("Fuel Tank Capacity (L)");
-        fuelTankCapacityField.setPrefWidth(120);
-        fuelTankCapacityField.getStyleClass().add("input-field");
-        fuelTankCapacityField.setMaxWidth(Double.MAX_VALUE);
-
+        fuelTankCapacityComboBox = new ComboBox<>();
+        fuelTankCapacityComboBox.setItems(FXCollections.observableArrayList(RaceCar.getAllowedFuelCapacities()));
+        fuelTankCapacityComboBox.setPromptText("Select Fuel Tank Capacity (L)");
+        fuelTankCapacityComboBox.setMaxWidth(Double.MAX_VALUE);
 
         // 3. Action Buttons
         configureButton = new Button("Configure Car & Track");
@@ -179,8 +175,8 @@ public class Main extends Application {
                 tyresComboBox,
                 aeroKitComboBox,
                 new Label("Car Specifics:"),
-                carWeightField,
-                fuelTankCapacityField,
+                carWeightComboBox,
+                fuelTankCapacityComboBox,
                 new Label("Select Race Details:"),
                 trackComboBox,
                 conditionsComboBox,
@@ -320,73 +316,59 @@ public class Main extends Application {
      * Also calculates and displays the initial pit stop strategy.
      */
     private void handleConfigureButton() {
-        Engine selectedEngine = engineComboBox.getSelectionModel().getSelectedItem();
-        Tyres selectedTyres = tyresComboBox.getSelectionModel().getSelectedItem();
-        AerodynamicKit selectedAeroKit = aeroKitComboBox.getSelectionModel().getSelectedItem();
-        selectedRaceTrack = trackComboBox.getSelectionModel().getSelectedItem();
-        selectedRaceConditions = conditionsComboBox.getSelectionModel().getSelectedItem();
+        Engine selectedEngine = engineComboBox.getValue();
+        Tyres selectedTyres = tyresComboBox.getValue();
+        AerodynamicKit selectedAeroKit = aeroKitComboBox.getValue();
+        Double selectedCarWeight = carWeightComboBox.getValue();
+        Double selectedFuelTankCapacity = fuelTankCapacityComboBox.getValue();
+        RaceTrack selectedTrack = trackComboBox.getValue();
+        RaceConditions selectedConditions = conditionsComboBox.getValue();
 
-        double carWeight;
-        double fuelTankCapacity;
-
-        try {
-            carWeight = Double.parseDouble(carWeightField.getText());
-            fuelTankCapacity = Double.parseDouble(fuelTankCapacityField.getText());
-            if (carWeight <= 0 || fuelTankCapacity <= 0) {
-                 throw new NumberFormatException("Values must be positive.");
-            }
-        } catch (NumberFormatException e) {
-            showErrorAlert("Invalid Input", "Please enter valid positive numbers for Car Weight and Fuel Tank Capacity.");
-            statusLabel.setText("Configuration failed: Invalid input.");
-            clearCarStats();
-            clearPitStops();
-            startSimulationButton.setDisable(true);
+        if (selectedEngine == null || selectedTyres == null || selectedAeroKit == null ||
+            selectedCarWeight == null || selectedFuelTankCapacity == null ||
+            selectedTrack == null || selectedConditions == null) {
+            showErrorAlert("Missing Selection", "Please select all car components, car specifics, and race details.");
             return;
         }
 
-
-        if (selectedEngine != null && selectedTyres != null && selectedAeroKit != null &&
-            selectedRaceTrack != null && selectedRaceConditions != null) {
-
-            // Create the RaceCar instance based on selections and inputs
-            selectedRaceCar = new RaceCar(selectedEngine, selectedTyres, selectedAeroKit, carWeight, fuelTankCapacity);
-
-            // Display calculated stats
-            topSpeedLabel.setText(String.format("Top Speed: %.1f km/h", selectedRaceCar.getTopSpeed()));
-            accelerationLabel.setText(String.format("0-100 km/h: %.2f s", selectedRaceCar.getAccelerationTime0To100()));
-            accelerationProfileLabel.setText("Acceleration Profile: " + selectedRaceCar.getAccelerationProfile());
-            handlingLabel.setText(String.format("Handling (1-10): %d/10", selectedRaceCar.getHandlingRating()));
-            corneringAbilityLabel.setText(String.format("Cornering Ability (1-100): %d/100", selectedRaceCar.getCorneringAbilityRating()));
-            fuelConsumptionLabel.setText(String.format("Base Fuel Consumption (per lap): %.2f L", selectedRaceCar.getBaseFuelConsumptionPerLap()));
-            fuelTankCapacityDisplayLabel.setText(String.format("Fuel Tank Capacity: %.1f L", selectedRaceCar.getFuelTankCapacity()));
-            carWeightDisplayLabel.setText(String.format("Car Weight: %.1f kg", selectedRaceCar.getCarWeight()));
-
-
-            // Calculate and display planned pit stops (using a temporary optimiser instance)
-            RaceStrategyOptimiser tempOptimiser = new RaceStrategyOptimiser(
-                new RaceCar(selectedEngine, selectedTyres, selectedAeroKit, carWeight, fuelTankCapacity), // Use a copy for planning
-                selectedRaceTrack,
-                selectedRaceConditions
-            );
-            List<Integer> plannedPitLaps = tempOptimiser.planPitStops();
-            displayPlannedPitStops(plannedPitLaps);
-
-
-            // Enable simulation button
-            startSimulationButton.setDisable(false);
-            raceLogTextArea.clear();
-            raceProgressBar.setProgress(0);
-            currentFuelLabel.setText("Current Fuel: N/A");
-            currentTyreWearLabel.setText("Current Tyre Wear: N/A");
-            statusLabel.setText("Configuration successful. Ready to simulate.");
-
-        } else {
-            showErrorAlert("Selection Error", "Please select all components, track, and conditions.");
-            statusLabel.setText("Configuration failed: Missing selections.");
-            clearCarStats();
-            clearPitStops();
-            startSimulationButton.setDisable(true);
+        try {
+            selectedRaceCar = new RaceCar(selectedEngine, selectedTyres, selectedAeroKit, selectedCarWeight, selectedFuelTankCapacity);
+        } catch (IllegalArgumentException ex) {
+            showErrorAlert("Invalid Car Configuration", ex.getMessage());
+            return;
         }
+
+        // Display calculated stats
+        topSpeedLabel.setText(String.format("Top Speed: %.1f km/h", selectedRaceCar.getTopSpeed()));
+        accelerationLabel.setText(String.format("0-100 km/h: %.2f s", selectedRaceCar.getAccelerationTime0To100()));
+        accelerationProfileLabel.setText("Acceleration Profile: " + selectedRaceCar.getAccelerationProfile());
+        handlingLabel.setText(String.format("Handling (1-10): %d/10", selectedRaceCar.getHandlingRating()));
+        corneringAbilityLabel.setText(String.format("Cornering Ability (1-100): %d/100", selectedRaceCar.getCorneringAbilityRating()));
+        fuelConsumptionLabel.setText(String.format("Base Fuel Consumption (per lap): %.2f L", selectedRaceCar.getBaseFuelConsumptionPerLap()));
+        fuelTankCapacityDisplayLabel.setText(String.format("Fuel Tank Capacity: %.1f L", selectedRaceCar.getFuelTankCapacity()));
+        carWeightDisplayLabel.setText(String.format("Car Weight: %.1f kg", selectedRaceCar.getCarWeight()));
+
+
+        // Calculate and display planned pit stops (using a temporary optimiser instance)
+        RaceStrategyOptimiser tempOptimiser = new RaceStrategyOptimiser(
+            new RaceCar(selectedEngine, selectedTyres, selectedAeroKit, selectedCarWeight, selectedFuelTankCapacity), // Use a copy for planning
+            selectedTrack,
+            selectedConditions
+        );
+        List<Integer> plannedPitLaps = tempOptimiser.planPitStops();
+        displayPlannedPitStops(plannedPitLaps);
+
+
+        // Enable simulation button
+        startSimulationButton.setDisable(false);
+        raceLogTextArea.clear();
+        raceProgressBar.setProgress(0);
+        currentFuelLabel.setText("Current Fuel: N/A");
+        currentTyreWearLabel.setText("Current Tyre Wear: N/A");
+        statusLabel.setText("Configuration successful. Ready to simulate.");
+
+        this.selectedRaceTrack = selectedTrack;
+        this.selectedRaceConditions = selectedConditions;
     }
 
     /**
@@ -528,8 +510,8 @@ public class Main extends Application {
         aeroKitComboBox.getSelectionModel().clearSelection();
         trackComboBox.getSelectionModel().clearSelection();
         conditionsComboBox.getSelectionModel().clearSelection();
-        carWeightField.setText("1000.0");
-        fuelTankCapacityField.setText("80.0");
+        carWeightComboBox.getSelectionModel().clearSelection();
+        fuelTankCapacityComboBox.getSelectionModel().clearSelection();
 
         // Clear displayed stats and simulation info
         clearCarStats();
