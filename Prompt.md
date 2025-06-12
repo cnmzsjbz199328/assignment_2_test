@@ -192,3 +192,141 @@
     *   `RaceSimulationTask` will be passed all necessary model instances (`RaceCar`, `RaceTrack`, `RaceConditions`, `RaceStrategyOptimiser`) via its constructor.
     *   **Refocus Main Class:** `Main.start()` will primarily focus on building the UI scene graph and initializing `GameAssetProvider` and `ExecutorService`. `Main.handleConfigureButton()` remains responsible for reading user inputs, constructing `RaceCar`, and calling `RaceStrategyOptimiser.planPitStops()`. It will then update UI elements based on the car's derived stats and the planned pit stops. `Main.handleStartSimulationButton()` will instantiate `RaceSimulationTask`, passing in the selected `RaceCar`, `RaceTrack`, `RaceConditions`, `RaceStrategyOptimiser`, and all the necessary UI update callbacks (each wrapped in `Platform.runLater` to ensure thread safety). It will then submit this task to the `executorService`. All UI-specific helper methods (e.g., `clearCarStats`, `displayPlannedPitStops`) should remain private methods within `Main`. `Main` will handle the `setOnSucceeded` and `setOnFailed` events of the `RaceSimulationTask` to update UI state after the task completes.
 *   **Instructions:** Provide the complete, updated `Main.java` class. Provide the complete code for the new `GameAssetProvider.java` class. Provide the complete code for the new `RaceSimulationTask.java` class. Confirm that `style.css` remains unchanged. You do not need to provide any other `.java` files (e.g., `Engine.java`, `RaceCar.java`, `RaceStrategyOptimiser.java`), as they are explicitly out of scope for modification.
+
+**Prompt 15: Preset Car Weight and Fuel Tank Capacity Options**
+*   **Role:** UI/UX Designer & Game Mechanic Specialist
+*   **Background:**
+    The requirements specify that car weight and fuel tank capacity must have at least three preset variations, not arbitrary user input. This ensures consistent simulation and easier testing.
+*   **Task:**
+    Add preset options (dropdown menus) for car weight and fuel tank capacity in the RaceCar class and frontend UI, prohibiting arbitrary user input.
+*   **Requirements:**
+    *   RaceCar class:
+        *   Add `carWeight` and `fuelTankCapacity` attributes.
+        *   Only allow assignment from a fixed set of values (e.g., 900kg, 1000kg, 1100kg for weight; 60L, 70L, 80L for fuel).
+        *   Provide static lists or enums for these options.
+    *   UI:
+        *   Add `ComboBox<Integer>` for car weight and `ComboBox<Integer>` for fuel tank capacity.
+        *   Remove or disable any free-form text input for these fields.
+        *   Display the selected values clearly in the car configuration summary.
+    *   Performance Calculation:
+        *   Ensure all relevant methods (e.g., acceleration, fuel consumption) use the selected weight and fuel capacity.
+        *   Update calculation formulas if needed to reflect the impact of these parameters.
+*   **Instructions:**
+    1. Update the `RaceCar` class to include the new attributes and restrict their values.
+    2. In the JavaFX UI, add two ComboBoxes for weight and fuel tank capacity, populated from the static lists.
+    3. When the user configures a car, ensure the selected values are passed to the `RaceCar` constructor.
+    4. Update the car stats display to show the selected weight and fuel tank capacity.
+    5. Provide a code snippet showing the ComboBox setup and integration with the car configuration logic.
+*   **Example:**
+```java
+// In RaceCar.java
+public static final List<Integer> ALLOWED_WEIGHTS = Arrays.asList(900, 1000, 1100);
+public static final List<Integer> ALLOWED_FUEL_CAPACITIES = Arrays.asList(60, 70, 80);
+
+// In Main.java (UI)
+ComboBox<Integer> weightComboBox = new ComboBox<>(FXCollections.observableArrayList(RaceCar.ALLOWED_WEIGHTS));
+ComboBox<Integer> fuelComboBox = new ComboBox<>(FXCollections.observableArrayList(RaceCar.ALLOWED_FUEL_CAPACITIES));
+```
+
+**Prompt 16: Integrating Weather, Temperature, and Cornering Ability Parameters**
+*   **Role:** Simulation Scenario Designer
+*   **Background:**
+    The simulation must reflect real-world racing conditions, including weather, temperature, and the car's cornering ability, as these directly affect strategy and performance.
+*   **Task:**
+    Integrate weather, temperature, and cornering ability parameters into RaceConditions and RaceCar, ensuring they affect race strategy and car performance.
+*   **Requirements:**
+    *   RaceConditions class:
+        *   Add attributes: `weather` (enum: DRY, WET, DAMP), `airTemperature`, `trackTemperature`, `humidity`.
+        *   Provide constructors and toString methods for easy UI integration.
+    *   RaceCar class:
+        *   Add `corneringAbilityRating` (int or double, e.g., 1-10 or 1-100).
+        *   Ensure this rating is calculated based on tyres, aero kit, and possibly weight.
+    *   Strategy/Performance Impact:
+        *   Adjust tyre wear, fuel consumption, and lap time calculations based on weather and temperature.
+        *   Use `corneringAbilityRating` in lap time and tyre wear formulas, especially for twisty tracks or wet conditions.
+    *   UI:
+        *   Add ComboBoxes for weather and temperature selection.
+        *   Display the effect of these parameters in the simulation log and car stats.
+*   **Instructions:**
+    1. Extend `RaceConditions` and `RaceCar` with the new attributes.
+    2. Update calculation methods to factor in these parameters.
+    3. In the UI, add controls for selecting weather and temperature.
+    4. Show, in the simulation log, how these conditions affect each lap.
+*   **Example:**
+```java
+// In RaceConditions.java
+public enum Weather { DRY, WET, DAMP; }
+private Weather weather;
+private double airTemperature;
+private double trackTemperature;
+private double humidity;
+
+// In RaceCar.java
+private int corneringAbilityRating; // Calculated in constructor or via method
+```
+// ... existing code ...
+
+**Prompt 17: Complete Separation of Business Logic and UI**
+*   **Role:** Software Architect
+*   **Background:**
+    Mixing UI and business logic leads to code duplication, poor maintainability, and testing difficulties. The simulation and strategy logic should be reusable and testable independently of the UI.
+*   **Task:** Refactor RaceSimulationTask and RaceStrategyOptimiser to fully separate business logic from UI, eliminating code duplication.
+*   **Requirements:**
+    *   RaceSimulationTask should extend `javafx.concurrent.Task<Void>`, but must not reference any UI components directly.
+    *   Accept all model objects and update callbacks (e.g., `Consumer<String> logCallback`).
+    *   All simulation state changes and progress updates are communicated via these callbacks.
+    *   RaceStrategyOptimiser contains all core logic for pit stop planning, lap simulation, and performance calculations, with no UI code or dependencies.
+    *   UI Layer only displays data and handles user input, registering callbacks with RaceSimulationTask to update UI elements (e.g., log, progress bar, pit stop table).
+    *   Business logic can be unit tested without any UI dependencies.
+*   **Instructions:**
+    1. Refactor `RaceSimulationTask` to accept callbacks for all UI updates.
+    2. Move any duplicated logic from the UI into `RaceStrategyOptimiser` or other backend classes.
+    3. In the UI, use `Platform.runLater` to update UI elements from callbacks.
+    4. Provide a code example showing how to wire up the callbacks.
+*   **Example:**
+```java
+// In RaceSimulationTask.java
+public RaceSimulationTask(..., Consumer<String> logCallback, Consumer<Double> progressCallback, ...) {
+    this.logCallback = logCallback;
+    this.progressCallback = progressCallback;
+}
+// In Main.java
+RaceSimulationTask task = new RaceSimulationTask(...,
+    msg -> Platform.runLater(() -> logTextArea.appendText(msg)),
+    progress -> Platform.runLater(() -> progressBar.setProgress(progress)),
+    ...
+);
+```
+
+**Prompt 18: Spec Parameter Consistency and Full Aerodynamic Kit Integration**
+*   **Role:** Compliance Engineer
+*   **Background:**
+    The project specification provides a table of aerodynamic kit parameters. All kits must be implemented exactly as specified, and the UI must allow users to select any kit.
+*   **Task:** Ensure all aerodynamic kits are implemented strictly according to spec parameters and integrate all kits at once.
+*   **Requirements:**
+    *   AerodynamicKit class and its instances must match the parameter table in the specification (drag coefficient, downforce, top speed, fuel efficiency, cornering ability, etc.).
+    *   Use a static factory method or data structure (e.g., `Map<String, AerodynamicKit>`) to instantiate all kits.
+    *   ComboBox for kit selection, populated from the factory/data structure.
+    *   Display all relevant parameters in the UI when a kit is selected.
+    *   Add a method to check that all kits’ parameters match the spec (for future maintainability).
+    *   List all available kits and their parameters in the user guide or help section.
+*   **Instructions:**
+    1. Implement a static method in `AerodynamicKit` to return all kits as per the spec.
+    2. In the UI, populate the ComboBox from this method.
+    3. When a kit is selected, display all its parameters in a summary panel.
+    4. Optionally, add a unit test to verify parameter consistency.
+*   **Example:**
+```java
+// In AerodynamicKit.java
+public static Map<String, AerodynamicKit> getAllSpecKits() {
+    Map<String, AerodynamicKit> kits = new HashMap<>();
+    kits.put("Standard Kit", new AerodynamicKit("Standard Kit", 0.30, 200, 250, 12, 6));
+    kits.put("Downforce-Focused Kit", new AerodynamicKit("Downforce-Focused Kit", 0.35, 350, 220, 10, 9));
+    // ... add all kits as per spec
+    return kits;
+}
+// In Main.java
+ComboBox<AerodynamicKit> kitComboBox = new ComboBox<>(FXCollections.observableArrayList(AerodynamicKit.getAllSpecKits().values()));
+kitComboBox.setOnAction(e -> displayKitDetails(kitComboBox.getValue()));
+```
+// ... existing code ...
