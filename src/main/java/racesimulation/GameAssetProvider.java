@@ -58,11 +58,11 @@ public class GameAssetProvider {
         trackVariations.add(new RaceTrack("Monza", 5.793, 53, 0.8, 0.9));   // Low wear, low consumption
         trackVariations.add(new RaceTrack("Silverstone", 5.891, 52, 1.0, 1.0)); // Medium wear, medium consumption
 
-        // Race Conditions variations (from Prompt 4)
+        // Race Conditions variations (from Prompt 4, updated for Prompt 16)
         conditionVariations = new ArrayList<>();
-        conditionVariations.add(new RaceConditions("Dry", 25.0, 35.0));
-        conditionVariations.add(new RaceConditions("Wet", 15.0, 18.0));
-        conditionVariations.add(new RaceConditions("Damp", 20.0, 25.0));
+        conditionVariations.add(new RaceConditions("Dry", RaceConditions.Weather.DRY, 25.0, 35.0, 0.3));
+        conditionVariations.add(new RaceConditions("Wet", RaceConditions.Weather.WET, 15.0, 18.0, 0.9));
+        conditionVariations.add(new RaceConditions("Damp", RaceConditions.Weather.DAMP, 20.0, 25.0, 0.6));
     }
 
     public List<Engine> getEngineVariations() {

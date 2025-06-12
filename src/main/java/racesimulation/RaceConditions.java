@@ -1,35 +1,33 @@
 package racesimulation;
 
-// RaceConditions class (from Prompt 4)
-class RaceConditions {
-    private String weather;
-    private double airTemperature;
-    private double trackTemperature;
+public class RaceConditions {
+    public enum Weather {
+        DRY, WET, DAMP
+    }
 
-    public RaceConditions(String weather, double airTemperature, double trackTemperature) {
+    private final String name; // e.g., "Dry", "Wet", "Damp"
+    private final Weather weather;
+    private final double airTemperature; // Celsius
+    private final double trackTemperature; // Celsius
+    private final double humidity; // Percentage (0.0 to 1.0)
+
+    public RaceConditions(String name, Weather weather, double airTemperature, double trackTemperature, double humidity) {
+        this.name = name;
         this.weather = weather;
         this.airTemperature = airTemperature;
         this.trackTemperature = trackTemperature;
+        this.humidity = humidity;
     }
 
-    public String getWeather() {
-        return weather;
-    }
-
-    public double getAirTemperature() {
-        return airTemperature;
-    }
-
-    public double getTrackTemperature() {
-        return trackTemperature;
-    }
+    // Getters
+    public String getName() { return name; }
+    public Weather getWeather() { return weather; }
+    public double getAirTemperature() { return airTemperature; }
+    public double getTrackTemperature() { return trackTemperature; }
+    public double getHumidity() { return humidity; }
 
     @Override
     public String toString() {
-        return "RaceConditions{" +
-                "weather='" + weather + '\'' +
-                ", airTemperature=" + String.format("%.1f", airTemperature) + "°C" +
-                ", trackTemperature=" + String.format("%.1f", trackTemperature) + "°C" +
-                '}';
+        return String.format("%s (Air: %.0f°C, Track: %.0f°C)", name, airTemperature, trackTemperature);
     }
 }

@@ -57,6 +57,11 @@ public class RaceSimulationTask extends Task<Void> {
         double maxTyreWearThreshold = RaceStrategyOptimiser.MAX_TYRE_WEAR_THRESHOLD;
         int pitStopCount = 0;
 
+        // Log the initial conditions at the start of the simulation
+        Platform.runLater(() -> {
+            logMessageConsumer.accept(String.format("Simulation starting under %s conditions...\n", raceConditions.getName()));
+        });
+
         for (int completedLap = 0; completedLap < totalLaps; completedLap++) {
             int currentLapNumber = completedLap + 1;
 
@@ -66,48 +71,40 @@ public class RaceSimulationTask extends Task<Void> {
             // --- Update UI during the lap (using Platform.runLater) ---
             final int lap = currentLapNumber; // Need final variable for lambda
             Platform.runLater(() -> {
-                logMessageConsumer.accept(String.format("Lap %d completed. Fuel: %.2f L, Tyres: %.2f%% wear.\n",
-                        lap, raceCar.getCurrentFuel(), raceCar.getCurrentTyreWear() * 100));
+                String weatherEffectLog = "";
+                switch (raceConditions.getWeather()) {
+                    case WET:
+                        weatherEffectLog = " (Wet track reducing tyre wear)";
+                        break;
+                    case DAMP:
+                        weatherEffectLog = " (Damp track slightly reducing tyre wear)";
+                        break;
+                }
+                logMessageConsumer.accept(String.format("Lap %d completed. Fuel: %.2f L, Tyres: %.2f%% wear.%s\n",
+                        lap, raceCar.getCurrentFuel(), raceCar.getCurrentTyreWear() * 100, weatherEffectLog));
                 updateFuelConsumer.accept(raceCar.getCurrentFuel());
                 updateTyreWearConsumer.accept(raceCar.getCurrentTyreWear() * 100);
                 updateProgressConsumer.accept((double) lap / totalLaps);
             });
 
-            // --- Pit Stop Decision AFTER the lap (based on state AFTER this lap, for the NEXT lap) ---
-            if (currentLapNumber < totalLaps) { // No pit stop decision after the final lap
-                double fuelNeededForNextLap = raceCar.getBaseFuelConsumptionPerLap() * raceTrack.getFuelConsumptionFactor();
-                boolean pitForFuel = raceCar.getCurrentFuel() < fuelNeededForNextLap;
-                boolean pitForTyres = raceCar.getCurrentTyreWear() >= maxTyreWearThreshold;
+            // --- Pit Stop Decision and Action moved to RaceStrategyOptimiser ---
+            String pitReason = raceOptimiser.checkAndPerformPitStop(currentLapNumber, totalLaps);
 
-                if (pitForFuel || pitForTyres) {
-                    // Perform pit stop actions
-                    raceCar.setCurrentFuel(raceCar.getFuelTankCapacity()); // Refuel
-                    raceCar.setCurrentTyreWear(0.0); // Change tyres
-                    pitStopCount++; // Increment pit stop counter
-
-                    // Declare final copies for use in lambda
-                    final boolean finalPitForFuel = pitForFuel;
-                    final boolean finalPitForTyres = pitForTyres;
-                    final int finalPitStopLap = lap; // Capture the lap number for the pit stop
-
-                    Platform.runLater(() -> {
-                        String reason = "";
-                        if (finalPitForFuel && finalPitForTyres) reason = "Fuel & Tyres";
-                        else if (finalPitForFuel) reason = "Fuel";
-                        else if (finalPitForTyres) reason = "Tyres";
-                        logMessageConsumer.accept(String.format("--- Pit Stop at end of Lap %d (%s) ---\n", finalPitStopLap, reason));
-                        addPitStopConsumer.accept(finalPitStopLap, reason); // Add actual pit stop to TableView
-                        updateFuelConsumer.accept(raceCar.getCurrentFuel()); // Update UI immediately after pit
-                        updateTyreWearConsumer.accept(raceCar.getCurrentTyreWear() * 100);
-                    });
-
-                    // Optional: Add a delay for the pit stop itself
-                    Thread.sleep(1000); // 1 second pit stop simulation time
-                }
+            if (pitReason != null) {
+                pitStopCount++;
+                final String reasonForUI = pitReason;
+                final int pitLap = currentLapNumber;
+                Platform.runLater(() -> {
+                    logMessageConsumer.accept(String.format("--- Pit Stop taken at end of lap %d. Reason: %s ---\n", pitLap, reasonForUI));
+                    addPitStopConsumer.accept(pitLap, reasonForUI);
+                    // Update UI immediately after pit stop
+                    updateFuelConsumer.accept(raceCar.getCurrentFuel());
+                    updateTyreWearConsumer.accept(raceCar.getCurrentTyreWear() * 100);
+                });
             }
 
-            // Add a small delay to simulate lap time
-            Thread.sleep(50); // Simulate lap time (reduced for faster simulation)
+            // Pause to make the simulation visible
+            Thread.sleep(200);
         }
 
         // Simulation finished, update summary
