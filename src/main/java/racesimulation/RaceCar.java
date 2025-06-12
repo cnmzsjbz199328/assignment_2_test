@@ -122,8 +122,8 @@ class RaceCar {
     }
 
     private double calculateTopSpeed() {
-        double baseTopSpeed = (engine.getPowerRating() / aeroKit.getDragCoefficient()) * 0.55;
-        return baseTopSpeed * aeroKit.getImpactOnTopSpeed();
+        // Top speed is now primarily determined by the aero kit, but slightly influenced by the engine's power.
+        return this.aeroKit.getTopSpeed() + (this.engine.getPowerRating() / 100.0);
     }
 
     private double calculate0To100AccelerationTime() {
@@ -142,21 +142,22 @@ class RaceCar {
     }
 
     private int calculateHandling() {
-        double baseHandling = (tyres.getGripLevel() / 10.0) + (aeroKit.getDownforceValue() / 2000.0);
-        double calculatedRating = baseHandling * aeroKit.getImpactOnCornering();
-        return (int) Math.round(Math.min(10.0, Math.max(1.0, calculatedRating)));
+        // Handling is now primarily determined by the aero kit's cornering ability, slightly adjusted by tyre grip.
+        return (int) Math.round(this.aeroKit.getCorneringAbility() * (1 + (this.tyres.getGripLevel() - 5) / 50.0));
     }
 
     private int calculateCorneringAbility() {
-        double gripContribution = tyres.getGripLevel() * 0.60;
-        double downforceContribution = (aeroKit.getDownforceValue() / 50.0) * 0.40;
-        double baseCornering = gripContribution + downforceContribution;
-        double modifiedCornering = baseCornering * aeroKit.getImpactOnCornering();
-        return (int) Math.round(Math.min(100.0, Math.max(1.0, modifiedCornering)));
+        // The detailed cornering ability rating is now primarily from the aero kit, adjusted by tyre grip.
+        double baseAbility = this.aeroKit.getCorneringAbility() * 10; // Scale to 1-100
+        double gripModifier = 1 + (this.tyres.getGripLevel() - 5) / 20.0; // Tyres give a +/- bonus
+        return (int) Math.round(Math.min(100.0, Math.max(1.0, baseAbility * gripModifier)));
     }
 
     private double calculateBaseFuelConsumptionPerLap() {
-        return 30.0 / engine.getFuelEfficiency();
+        // Fuel consumption is now a combination of the engine's efficiency and the aero kit's efficiency.
+        // We can average them or make one a primary factor. Let's average them.
+        double combinedEfficiency = (this.engine.getFuelEfficiency() + this.aeroKit.getFuelEfficiency()) / 2.0;
+        return 30.0 / combinedEfficiency;
     }
 
     @Override

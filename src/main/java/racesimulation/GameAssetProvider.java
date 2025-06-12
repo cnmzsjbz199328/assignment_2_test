@@ -45,12 +45,7 @@ public class GameAssetProvider {
         tyreVariations.add(new Tyres("Hard Compound", 65, 0.03, 100, 120));
 
         // Aerodynamic Kit variations (from Prompt 6)
-        aeroKitVariations = new ArrayList<>();
-        // Assuming AerodynamicKit constructor takes name, drag, downforce, top speed impact, cornering impact
-        aeroKitVariations.add(new AerodynamicKit("Standard Kit", 0.33, 1200, 1.0, 1.0));
-        aeroKitVariations.add(new AerodynamicKit("Downforce-Focused Kit", 0.38, 2800, 0.95, 1.2));
-        aeroKitVariations.add(new AerodynamicKit("Low-Drag Kit", 0.25, 800, 1.1, 0.9));
-        aeroKitVariations.add(new AerodynamicKit("Ground Effect Kit", 0.30, 3500, 1.02, 1.35));
+        aeroKitVariations = new ArrayList<>(AerodynamicKit.getAllSpecKits().values());
 
         // Race Track variations (from Prompt 4)
         trackVariations = new ArrayList<>();
