@@ -11,10 +11,10 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Test for TemperatureRange Class")
+@DisplayName("[WB_TER]: Test for TemperatureRange Class")
 class TemperatureRangeTest {
 
-    @DisplayName("[001 - Critical]: Test constructor and getters with valid values")
+    @DisplayName("[WB_TER_01 - Critical]: Test constructor and getters with valid values")
     @ParameterizedTest(name="Test: {index}/3, minTemp: {0}, maxTemp: {1}")
     @CsvSource({
             "1.0, 10.0",
@@ -30,9 +30,9 @@ class TemperatureRangeTest {
         );
     }
 
-    @DisplayName("[002 - Additional?]: Test constructor with negative values")
+    @DisplayName("[WB_TER_02 - Critical]: Test constructor with negative values")
     @ParameterizedTest(name="Test: {index}/2, minTemp: {0}, maxTemp: {1}")
-    @CsvSource({"-1.0, 10.0", "-5.0, -1.0"})
+    @CsvSource({"-1.0, 10.0", "-0.02, -0.01"})
     void constructorWithNegativeValues(double minTemp, double maxTemp) {
         TemperatureRange tempRange = new TemperatureRange(minTemp, maxTemp);
 
@@ -42,7 +42,7 @@ class TemperatureRangeTest {
         );
     }
 
-    @DisplayName("[003 - Additional?]: Test constructor with extreme values]")
+    @DisplayName("[WB_TER_03 - Additional]: Test constructor with extreme values]")
     @ParameterizedTest(name="Test: {index}/4, minTemp: {0}, maxTemp: {1}")
     @MethodSource("extremeValues")
     void constructorWithExtremeValues(double minTemp, double maxTemp) {
@@ -62,19 +62,13 @@ class TemperatureRangeTest {
         );
     };
 
-    // shouldn't this be an error?
-    @DisplayName("[004 - Critical?]: Test constructor with reversed min and max values")
+    @DisplayName("[WB_TER_04 - Critical]: Test constructor with reversed min and max values")
     @Test
     void constructorWithReversedMinMaxValues() {
-        TemperatureRange tempRange = new TemperatureRange(10.0, 1.0);
-
-        assertAll(
-                () -> assertEquals(10.0, tempRange.getMinTemp()),
-                () -> assertEquals(1.0, tempRange.getMaxTemp())
-        );
+        assertThrows(IllegalArgumentException.class, () -> new TemperatureRange(10.0, 1.0));
     }
 
-    @DisplayName("[005 - Additional?]: Test toString with valid values")
+    @DisplayName("[WB_TER_05 - Critical]: Test toString with valid values")
     @ParameterizedTest(name="Test: {index}/2")
     @CsvSource({
             "1.0, 10.0",

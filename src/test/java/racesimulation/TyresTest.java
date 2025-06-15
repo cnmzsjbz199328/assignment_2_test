@@ -9,10 +9,10 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Test for Tyres Class")
+@DisplayName("[WB_TYR]: Test for Tyres Class")
 class TyresTest {
 
-    @DisplayName("[001 - Critical]: Test constructor and getters with valid values")
+    @DisplayName("[WB_TYR_01 - Critical]: Test constructor and getters with valid values")
     @ParameterizedTest(name="Test: {index}/5")
     @CsvSource({
             "compound, 5, 1.0, 1.0, 10.0",
@@ -32,7 +32,7 @@ class TyresTest {
         );
     }
 
-    @DisplayName("[002 - Core?]: Test constructor with null and empty compound")
+    @DisplayName("[WB_TYR_02 - Core]: Test constructor with null and empty compound")
     @ParameterizedTest(name="Test: {index}/2, compoundName: {0}")
     @NullAndEmptySource
     void constructorWithNullAndEmptyCompound(String compound) {
@@ -40,7 +40,7 @@ class TyresTest {
         assertEquals(compound, tyres.getCompound());
     }
 
-    @DisplayName("[003 - additional?]: Test constructor with special character compound name")
+    @DisplayName("[WB_TYR_03 - Core]: Test constructor with special character compound name")
     @ParameterizedTest(name="Test: {index}/4, compoundName: {0}")
     @ValueSource(strings = {" ", "12345", "!@#$%^&?", "あいう"})
     void constructorWithSpecialCharacterCompoundName(String compound) {
@@ -48,7 +48,7 @@ class TyresTest {
         assertEquals(compound, tyres.getCompound());
     }
 
-    @DisplayName("[004 - Core?]: Test constructor with extreme values")
+    @DisplayName("[WB_TYR_04 - Additional]: Test constructor with extreme values")
     @ParameterizedTest(name="Test: {index}/8, grip: {0} wearRate: {1}, minTemp: {2}, maxTemp: {3}")
     @MethodSource("extremeValues")
     void constructorWithExtremeValues(int grip, double wearRate, double minTemp, double maxTemp) {
@@ -73,16 +73,13 @@ class TyresTest {
         );
     };
 
-    // this should fail?
-    @DisplayName("[005 - Core?]: Test constructor with reversed temperature values")
+    @DisplayName("[WB_TYR_05 - Critical]: Test constructor with reversed temperature values")
     @Test
     void constructorWithReversedTempValues() {
-        Tyres tyres = new Tyres("compounds", 5, 1.0, 10.0, 1.0);
-
-        assertEquals(new TemperatureRange(10.0, 1.0).toString(), tyres.getOptimalTempRange().toString());
+        assertThrows(IllegalArgumentException.class, () -> new Tyres("compounds", 5, 1.0, 10.0, 1.0));
     }
 
-    @DisplayName("[006 - additional?]: Test toString with valid values")
+    @DisplayName("[WB_TYR_06 - Critical]: Test toString with valid values")
     @ParameterizedTest(name="Test: {index}/3")
     @CsvSource({
             "compound, 5, 1.0, 1.0, 10.0",
@@ -97,7 +94,7 @@ class TyresTest {
         assertEquals(expected, tyres.toString());
     }
 
-    @DisplayName("[007 - Additional?]: Test toString with null and empty compound")
+    @DisplayName("[WB_TYR_07 - Additional]: Test toString with null and empty compound")
     @ParameterizedTest(name="Test: {index}/2, compoundName: {0}")
     @NullAndEmptySource
     void toStringWithNullAndEmptyCompound(String compound) {

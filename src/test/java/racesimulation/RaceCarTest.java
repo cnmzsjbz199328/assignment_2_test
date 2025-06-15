@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("[WB_RCT]: Test for RaceCar class")
 class RaceCarTest {
 
     static RaceCar raceCarTestOne;
@@ -28,7 +29,7 @@ class RaceCarTest {
                 1100.00, 80.0);
     }
 
-    @DisplayName("WB_RCT_01 - Critical: Testing constructor and getter (Engine Parameters).")
+    @DisplayName("[WB_RCT_01 - Critical]: Testing constructor and getter (Engine Parameters).")
     @Test
     public void testConstructorEngineParameters() {
         // Test Engine parameters
@@ -40,7 +41,7 @@ class RaceCarTest {
         );
     }
 
-    @DisplayName("WB_RCT_02 - Critical: Testing constructor and getter (Tyre Parameters).")
+    @DisplayName("[WB_RCT_02 - Critical]: Testing constructor and getter (Tyre Parameters).")
     @Test
     public void testConstructorTyreParameters() {
         TemperatureRange tempRangeOne = new TemperatureRange(1.0, 10.0);
@@ -52,7 +53,7 @@ class RaceCarTest {
         );
     }
 
-    @DisplayName("WB_RCT_03 - Critical: Testing constructor and getter (AerodynamicKit Parameters).")
+    @DisplayName("[WB_RCT_03 - Critical]: Testing constructor and getter (AerodynamicKit Parameters).")
     @Test
     public void testConstructorAerodynamicKitParameters() {
         assertAll(
@@ -65,7 +66,7 @@ class RaceCarTest {
         );
     }
 
-    @DisplayName("WB_RCT_04 - Critical: Testing constructor and getter (Other Parameters).")
+    @DisplayName("[WB_RCT_04 - Critical]: Testing constructor and getter (Other Parameters).")
     @Test
     public void testConstructorOtherParameters() {
         assertAll(
@@ -76,7 +77,7 @@ class RaceCarTest {
         );
     }
 
-    @DisplayName("WB_RCT_05 - Core: Testing constructor (IllegalArgumentException for weight).")
+    @DisplayName("[WB_RCT_05 - Core]: Testing constructor (IllegalArgumentException for weight).")
     @Test
     public void testConstructorInvalidArgumentExceptionCarWeight() {
         assertThrows(IllegalArgumentException.class, () -> {
@@ -84,7 +85,7 @@ class RaceCarTest {
         });
     }
 
-    @DisplayName("WB_RCT_06 - Core: Testing constructor (IllegalArgumentException for Fuel Capacity).")
+    @DisplayName("[WB_RCT_06 - Cor]e: Testing constructor (IllegalArgumentException for Fuel Capacity).")
     @Test
     public void testConstructorInvalidArgumentExceptionFuelCapacity() {
         assertThrows(IllegalArgumentException.class, () -> {
@@ -92,7 +93,7 @@ class RaceCarTest {
         });
     }
 
-    @ParameterizedTest(name = "WB_RCT_06 - Critical: Testing setters for currentFuel method.")
+    @ParameterizedTest(name = "[WB_RCT_06 - Critical]: Testing setters for currentFuel method.")
     @CsvSource({"80.0", "60.0", "40.0", "20.0", "0.1", "-0.1", "-1.0"})
     public void testSetterCurrentFuel(double testNumbers) {
         raceCarTestTwo.setCurrentFuel(testNumbers);
@@ -103,7 +104,7 @@ class RaceCarTest {
         }
     }
 
-    @ParameterizedTest(name = "WB_RCT_07 - Critical: Testing setters for currentTyreWear method.")
+    @ParameterizedTest(name = "[WB_RCT_07 - Critical]: Testing setters for currentTyreWear method.")
     @CsvSource({"80.0", "1.1", "0.9", "0.5", "0.1", "-0.1", "-1.0"})
     public void testSetterCurrentTyreWear(double testNumbers) {
         raceCarTestTwo.setCurrentTyreWear(testNumbers);
@@ -116,7 +117,7 @@ class RaceCarTest {
         }
     }
 
-    @DisplayName("WB_RCT_07 - Critical: Testing method calculate top speed and subsequent getter method for" +
+    @DisplayName("[WB_RCT_07 - Critical]: Testing method calculate top speed and subsequent getter method for" +
             "getTopSpeed.")
     @Test
     public void testMethodCalculateTopSpeed() {
@@ -124,7 +125,7 @@ class RaceCarTest {
         assertEquals(testCalculation, raceCarTestTwo.getTopSpeed());
     }
 
-    @DisplayName("WB_RCT_08 - Critical: Testing method calculate acceleration time and subsequent getter method for" +
+    @DisplayName("[WB_RCT_08 - Critical]: Testing method calculate acceleration time and subsequent getter method for" +
             "getAccelerationTime0To100.")
     @Test
     public void testMethodCalculateAccelerationTime() {
@@ -132,7 +133,7 @@ class RaceCarTest {
         assertEquals(testCalculation, raceCarTestTwo.getAccelerationTime0To100());
     }
 
-    @DisplayName("WB_RCT_09 - Critical: Testing method for Aggressive calculation of powerToWeightRatio in" +
+    @DisplayName("[WB_RCT_09 - Critical]: Testing method for Aggressive calculation of powerToWeightRatio in" +
             "method determineAccelerationProfile.")
     @Test
     public void testAggressiveAccelerationProfile() {
@@ -141,7 +142,7 @@ class RaceCarTest {
         assertEquals("Aggressive", raceCarTestFive.getAccelerationProfile());
     }
 
-    @DisplayName("WB_RCT_10 - Critical: Testing method for Balanced calculation of powerToWeightRatio in" +
+    @DisplayName("[WB_RCT_10 - Critical]: Testing method for Balanced calculation of powerToWeightRatio in" +
             "method determineAccelerationProfile.")
     @Test
     public void testBalancedAccelerationProfile() {
@@ -150,35 +151,35 @@ class RaceCarTest {
         assertEquals("Balanced", raceCarTestFive.getAccelerationProfile());
     }
 
-    @DisplayName("WB_RCT_11 - Critical: Testing method for Conservative calculation of powerToWeightRatio in" +
+    @DisplayName("[WB_RCT_11 - Critical]: Testing method for Conservative calculation of powerToWeightRatio in" +
             "method determineAccelerationProfile.")
     @Test
     public void testConservativeAccelerationProfile() {
         assertEquals("Conservative", raceCarTestTwo.getAccelerationProfile());
     }
 
-    @DisplayName("WB_RCT_12 - Critical: Testing calculation for handling to be between 1 to 10.")
+    @DisplayName("[WB_RCT_12 - Critical]: Testing calculation for handling to be between 1 to 10.")
     @Test
     public void testCalculationHandling() {
         int expectedNumber = raceCarTestTwo.getHandlingRating();
         assertTrue(expectedNumber >= 1 && expectedNumber <= 10);
     }
 
-    @DisplayName("WB_RCT_13 - Critical: Testing calculation for CorneringAbility to be between 1 to 99.")
+    @DisplayName("[WB_RCT_13 - Critical]: Testing calculation for CorneringAbility to be between 1 to 99.")
     @Test
     public void testCalculationCorneringAbility() {
         int expectedNumber = raceCarTestTwo.getCorneringAbilityRating();
         assertTrue(expectedNumber > 1 && expectedNumber < 100);
     }
 
-    @DisplayName("WB_RCT_14 - Critical: Testing calculation for Fuel Consumption per Lap.")
+    @DisplayName("[WB_RCT_14 - Critical]: Testing calculation for Fuel Consumption per Lap.")
     @Test
     public void testCalculationFuelConsumptionPerLap() {
         double expectedNumber = 30 / ((testEngine.getFuelEfficiency() + testAerodynamicKit.getFuelEfficiency()) / 2);
         assertEquals(expectedNumber, raceCarTestTwo.getBaseFuelConsumptionPerLap());
     }
 
-    @DisplayName("WB_RCT_14 - Critical: Testing to String method")
+    @DisplayName("[WB_RCT_14 - Critical]: Testing to String method")
     @Test
     public void testToString() {
         String expected = "RaceCar configured with:\n" +

@@ -8,6 +8,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("[WB_GAP]: Test for GameAssetProvider class")
 class GameAssetProviderTest {
 
     static GameAssetProvider testGameAssetProvider;
@@ -27,7 +28,7 @@ class GameAssetProviderTest {
         testRaceConditions = testGameAssetProvider.getConditionVariations();
     }
 
-    @DisplayName("WB_GAPV_01: Testing Lists are not null or empty after setUp. (Criticality: Critical)")
+    @DisplayName("[WB_GAP_01 - Critical]: Testing Lists are not null after setUp.")
     @Test
     public void testNotNullLists() {
         assertAll(
@@ -37,7 +38,11 @@ class GameAssetProviderTest {
                 () -> assertNotNull(testRaceTrack),
                 () -> assertNotNull(testRaceConditions)
         );
+    }
 
+    @DisplayName("[WB_GAP_02 - Critical]: Testing Lists are not empty after setUp.")
+    @Test
+    public void testNotEmptyLists() {
         assertAll(
                 () -> assertFalse(testEngine.isEmpty()),
                 () -> assertFalse(testTyres.isEmpty()),
@@ -47,7 +52,7 @@ class GameAssetProviderTest {
         );
     }
 
-    @DisplayName("WB_GAPV_02: Testing Lists size after setUp. (Criticality: Critical)")
+    @DisplayName("[WB_GAP_03 - Critical]: Testing Lists size after setUp.")
     @Test
     public void testListsSize() {
         assertAll(
@@ -59,8 +64,8 @@ class GameAssetProviderTest {
         );
     }
 
-    @DisplayName("WB_GAPV_03: Testing constructor that initialised private method initializeGameAssets," +
-            "to check if Engine types were added into List. (Criticality: Critical)")
+    @DisplayName("[WB_GAP_04 - Critical]: Testing constructor that initialised private method initializeGameAssets," +
+            "to check if Engine types were added into List.")
     @Test
     public void testConstructorForEngineTypesAddedIntoList() {
         // Testing all variables that are present for first item in <List> testEngine
@@ -88,8 +93,8 @@ class GameAssetProviderTest {
         );
     }
 
-    @DisplayName("WB_GAPV_04: Testing constructor that initialised private method initializeGameAssets," +
-            "to check if Tyre variations were added into List. (Criticality: Critical)")
+    @DisplayName("[WB_GAP_05 - Critical]: Testing constructor that initialised private method initializeGameAssets," +
+            "to check if Tyre variations were added into List.")
     @Test
     public void testConstructorForTyreVariationsAddedIntoList() {
         TemperatureRange tempRangeOne = new TemperatureRange(80, 100);
@@ -121,8 +126,8 @@ class GameAssetProviderTest {
         );
     }
 
-    @DisplayName("WB_GAPV_05: Testing constructor that initialised private method initializeGameAssets," +
-            "to check if all AerodynamicKits were added into List. (Criticality: Critical)")
+    @DisplayName("[WB_GAP_06 - Critical]: Testing constructor that initialised private method initializeGameAssets," +
+            "to check if all AerodynamicKits were added into List.")
     @Test
     public void testConstructorForAerodynamicKitsAddedIntoList() {
         // Testing all variables that are present for first item in <List> testAerodynamicKit
@@ -216,8 +221,8 @@ class GameAssetProviderTest {
         );
     }
 
-    @DisplayName("WB_GAPV_06: Testing constructor that initialised private method initializeGameAssets," +
-            "to check if Race Tracks were added into List. (Criticality: Critical)")
+    @DisplayName("[WB_GAP_07 - Critical]: Testing constructor that initialised private method initializeGameAssets," +
+            "to check if Race Tracks were added into List.")
     @Test
     public void testConstructorForRaceTracksAddedIntoList() {
         // Testing all variables that are present for first item in <List> testRaceTrack
@@ -248,8 +253,8 @@ class GameAssetProviderTest {
         );
     }
 
-    @DisplayName("WB_GAPV_07: Testing constructor that initialised private method initializeGameAssets," +
-            "to check if Race Conditions were added into List. (Criticality: Critical)")
+    @DisplayName("[WB_GAP_08 - Critical]: Testing constructor that initialised private method initializeGameAssets," +
+            "to check if Race Conditions were added into List.")
     @Test
     public void testConstructorForRaceConditionsAddedIntoList() {
         // Testing all variables that are present for first item in <List> testRaceConditions
@@ -280,7 +285,7 @@ class GameAssetProviderTest {
         );
     }
 
-    @DisplayName("WB_GAPV_08: Testing getter method for List<Engine> engineVariations. (Criticality: Core)")
+    @DisplayName("[WB_GAP_09 - Critical]: Testing getter method for List<Engine> engineVariations.")
     @Test
     public void testGetterEngineVariations() {
         String expected = "[Engine{name='Standard V6', powerRating=300 HP, fuelEfficiency=7.5 km/l, reliability=" +
@@ -290,7 +295,7 @@ class GameAssetProviderTest {
         assertEquals(expected, testGameAssetProvider.getEngineVariations().toString());
     }
 
-    @DisplayName("WB_GAPV_09: Testing getter method for List<Tyre> tyreVariations. (Criticality: Core)")
+    @DisplayName("[WB_GAP_10 - Critical]: Testing getter method for List<Tyre> tyreVariations.")
     @Test
     public void testGetterTyreVariations() {
         String expected = "[Tyres{compound='Soft Compound', gripLevel=95, wearRate=0.15, optimalTempRange=(80.0 - 100.0 °C)}" +
@@ -299,7 +304,7 @@ class GameAssetProviderTest {
         assertEquals(expected, testGameAssetProvider.getTyreVariations().toString());
     }
 
-    @DisplayName("WB_GAPV_10: Testing getter method for List<AerodynamicKit> aeroKitVariations. (Criticality: Core)")
+    @DisplayName("[WB_GAP_11 - Critical]: Testing getter method for List<AerodynamicKit> aeroKitVariations.")
     @Test
     public void testGetterAeroKitVariations() {
         String expected = "[Standard Kit, Downforce-Focused Kit, Low-Drag Kit, Adjustable Aero Kit, " +
@@ -307,7 +312,7 @@ class GameAssetProviderTest {
         assertEquals(expected, testGameAssetProvider.getAeroKitVariations().toString());
     }
 
-    @DisplayName("WB_GAPV_11: Testing getter method for List<RaceTrack> trackVariations. (Criticality: Core)")
+    @DisplayName("[WB_GAP_12 - Critical]: Testing getter method for List<RaceTrack> trackVariations.")
     @Test
     public void testGetterTrackVariations() {
         String expected = "[RaceTrack{name='Monaco', length_km=3.337 km, numberOfLaps=78, tyreWearFactor=1.30, " +
@@ -317,7 +322,7 @@ class GameAssetProviderTest {
         assertEquals(expected, testGameAssetProvider.getTrackVariations().toString());
     }
 
-    @DisplayName("WB_GAPV_12: Testing getter method for List<RaceConditions> conditionVariations. (Criticality: Core)")
+    @DisplayName("[WB_GAP_13 - Critical]: Testing getter method for List<RaceConditions> conditionVariations.")
     @Test
     public void testGetterConditionVariations() {
         String expected = "[Dry (Air: 25°C, Track: 35°C), Wet (Air: 15°C, Track: 18°C), Damp (Air: 20°C, Track: 25°C)]";

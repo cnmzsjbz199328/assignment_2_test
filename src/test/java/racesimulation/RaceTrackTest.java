@@ -11,10 +11,10 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Test for RaceTrack Class")
+@DisplayName("[WB_RTR]: Test for RaceTrack class")
 class RaceTrackTest {
 
-    @DisplayName("[001 - Critical]:Test constructor and getters with valid values")
+    @DisplayName("[WB_RTR_01 - Critical]: Test constructor and getters with valid values")
     @ParameterizedTest(name="Test: {index}/3")
     @CsvSource({
             "Adelaide, 5.0, 5, 1.5, 1.5",
@@ -33,7 +33,7 @@ class RaceTrackTest {
         );
     }
 
-    @DisplayName("[002 - Critical?]: Test constructor with null and empty name")
+    @DisplayName("[WB_RTR_02 - Core]: Test constructor with null and empty name")
     @ParameterizedTest(name="Test: {index}/2, trackName: {0}")
     @NullAndEmptySource
     void constructorWithNullAndEmptyName(String name) {
@@ -42,7 +42,7 @@ class RaceTrackTest {
         assertEquals(name, track.getName());
     }
 
-    @DisplayName("[002 - Critical?]: Test constructor with special character name")
+    @DisplayName("[WB_RTR_03 - Core]: Test constructor with special character name")
     @ParameterizedTest(name="Test: {index}/4, trackName: {0}")
     @ValueSource(strings = {" ", "12345", "!@#$?%^&", "あいう"})
     void constructorWithSpecialCharacterName(String name) {
@@ -51,7 +51,7 @@ class RaceTrackTest {
         assertEquals(name, track.getName());
     }
 
-    @DisplayName("[003 - Core?]: Test constructor with extreme numbers")
+    @DisplayName("[WB_RTR_04 - Additional]: Test constructor with extreme numbers")
     @ParameterizedTest(name="Test: {index}/8, trackLength: {0}, laps: {1}, tyreWearFactor: {2}, fuelConsumptionFactor: {3}")
     @MethodSource("extremeNumbers")
     void constructorWithExtremeValues(double length, int laps, double tyre, double fuel) {
@@ -77,7 +77,7 @@ class RaceTrackTest {
         );
     }
 
-    @DisplayName("[004 - Core?]: Test constructor with negative numbers")
+    @DisplayName("[WB_RTR_05 - Core]: Test constructor with negative numbers")
     @ParameterizedTest(name="Test: {index}/4, trackLength: {0}, laps: {1}, tyreWearFactor: {2}, fuelConsumptionFactor: {3}")
     @CsvSource({
             "-1.0, 2, 1.5, 1.5",
@@ -86,17 +86,10 @@ class RaceTrackTest {
             "5.0, 2, 1.5, -1.0"
     })
     void constructorWithNegativeValues(double length, int laps, double tyre, double fuel) {
-        RaceTrack track = new RaceTrack("Track", length, laps, tyre, fuel);
-
-        assertAll(
-                () -> assertEquals(length, track.getLength_km()),
-                () -> assertEquals(laps, track.getNumberOfLaps()),
-                () -> assertEquals(tyre, track.getTyreWearFactor()),
-                () -> assertEquals(fuel, track.getFuelConsumptionFactor())
-        );
+        assertThrows(IllegalArgumentException.class, () -> new RaceTrack("Track", length, laps, tyre, fuel));
     }
 
-    @DisplayName("[005 - Additional?]: Test toString with valid values")
+    @DisplayName("[WB_RTR_06 - Critical]: Test toString with valid values")
     @ParameterizedTest(name="Test: {index}/3")
     @CsvSource({
             "Adelaide, 5.0, 5, 1.0, 1.0",
@@ -111,7 +104,7 @@ class RaceTrackTest {
         assertEquals(expected, track.toString());
     }
 
-    @DisplayName("[006 - Additional?]: Test toString with null and empty name")
+    @DisplayName("[WB_RTR_07 - Additional]: Test toString with null and empty name")
     @ParameterizedTest(name="Test: {index}/2, trackName: {0}")
     @NullAndEmptySource
     void toStringWithNullAndEmptyName(String name) {

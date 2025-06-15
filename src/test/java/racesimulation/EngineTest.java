@@ -5,6 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+@DisplayName("[WB_ENG]: Test for Engine class")
 class EngineTest {
     static Engine engineTestOne;
     static Engine engineTestTwo;
@@ -15,7 +17,7 @@ class EngineTest {
         engineTestTwo = new Engine("Verstappen", 4, 0.8, 1.0);
     }
 
-    @DisplayName("WB_ENGE_01: Testing the Constructor. (Criticality: Critical)")
+    @DisplayName("[WB_ENG_01 - Critical]: Testing the Constructor.")
     @Test
     public void testConstructor () {
         assertAll(
@@ -26,31 +28,31 @@ class EngineTest {
         );
     }
 
-    @DisplayName("WB_ENGE_02: Test getter method for Name. (Criticality: Core)")
+    @DisplayName("[WB_ENG_02 - Additional]: Test getter method for Name.")
     @Test
     public void testGetterName() {
         assertEquals("Verstappen", engineTestTwo.getName());
     }
 
-    @DisplayName("WB_ENGE_03: Test getter method for Power Rating. (Criticality: Core)")
+    @DisplayName("[WB_ENG_03 - Additional]: Test getter method for Power Rating.")
     @Test
     public void testGetterPowerRating() {
         assertEquals(4, engineTestTwo.getPowerRating());
     }
 
-    @DisplayName("WB_ENGE_04: Test getter method for Fuel Efficiency. (Criticality: Core)")
+    @DisplayName("[WB_ENG_04 - Critical]: Test getter method for Fuel Efficiency.")
     @Test
     public void testGetterFuelEfficiency() {
         assertEquals(0.8, engineTestTwo.getFuelEfficiency());
     }
 
-    @DisplayName("WB_ENGE_05: Test getter method for Reliability. (Criticality: Core)")
+    @DisplayName("[WB_ENG_05 - Additional]: Test getter method for Reliability.")
     @Test
     public void testGetterReliability() {
         assertEquals(1.0, engineTestTwo.getReliability());
     }
 
-    @DisplayName("WB_ENGE_06: Test to string method. (Criticality: Additional")
+    @DisplayName("[WB_ENG_06 - Critical]: Test to string method. ")
     @Test
     public void testToString() {
         String expectationTestOne = "Engine{" +

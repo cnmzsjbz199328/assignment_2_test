@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Test for RaceStrategyOptimiser Class")
+@DisplayName("[WB_RSO]: Test for RaceStrategyOptimiser class")
 class RaceStrategyOptimiserTest {
 
     RaceCar raceCar;
@@ -40,7 +40,7 @@ class RaceStrategyOptimiserTest {
         );
     }
 
-    @DisplayName("[001 - Critical]: Test Constructor and Getters with valid params")
+    @DisplayName("[WB_RSO_01 - Critical]: Test Constructor and Getters with valid params")
     void constructorAndGettersWithValidParams() {
         RaceStrategyOptimiser strategy = new RaceStrategyOptimiser(
                 raceCar, raceTrack, raceConditions
@@ -52,7 +52,7 @@ class RaceStrategyOptimiserTest {
         );
     }
 
-    @DisplayName("[002 - Core?]: Test Constructor with null param")
+    @DisplayName("[WB_RSO_02 - Core]: Test Constructor with null param")
     @MethodSource("constructorParamNull")
     @ParameterizedTest(name="Test: {index}/3, nullItem: {3}")
     void constructorWithNull(RaceCar raceCar, RaceTrack raceTrack, RaceConditions raceConditions, String nullItem) {
@@ -80,8 +80,7 @@ class RaceStrategyOptimiserTest {
         );
     }
 
-    // RaceCar .getCurrentFuel should return a value that is 0.###? or should that be handled in UI related section?
-    @DisplayName("[003 - Critical?]: Test simulateLap with different weathers conditions of DRY, DAMP, WET")
+    @DisplayName("[WB_RSO_03 - Critical]: Test simulateLap with different weathers conditions of DRY, DAMP, WET")
     @ParameterizedTest(name="Test: {index}/3, weather: {0}, fuelAfterLap: {1}, tyreWearAfterLap: {2}")
     @CsvSource({
             "DRY, 65.0, 0.02",
@@ -99,7 +98,7 @@ class RaceStrategyOptimiserTest {
         );
     }
 
-    @DisplayName("[004 - Additional?]: Test simulateLap with different airTemperature")
+    @DisplayName("[WB_RSO_04 - Critical]: Test simulateLap with different airTemperature")
     @ParameterizedTest(name="Test: {index}/10, airTemperature: {0}°C, fuelAfterLap: {1}, tyreWearAfterLap: {2}")
     @CsvSource({
             "-1.0, 64.25, 0.02",
@@ -124,7 +123,7 @@ class RaceStrategyOptimiserTest {
         );
     }
 
-    @DisplayName("[000 - Additional?]: Test simulateLap with extreme temperature values")
+    @DisplayName("[WB_RSO_05 - Additional]: Test simulateLap with extreme temperature values")
     @ParameterizedTest(name="Test: {index}/2, airTemperature: {0}, fuelAfterLap: {1}, tyreWearAfterLap: {2}")
     @MethodSource("extremeAirTemperature")
     void simulateLapWithExtremeAirTemperature(double airTemp, double fuelAfterLap, double tyreWearAfterLap) {
@@ -144,7 +143,7 @@ class RaceStrategyOptimiserTest {
         );
     }
 
-    @DisplayName("[005 - Additional?]: Test simulateLap with different params to constructor params")
+    @DisplayName("[WB_RSO_06 - Critical]: Test simulateLap with different params to constructor params")
     @Test
     void simulateLapWithDifferentParamsToConstructor() {
         RaceStrategyOptimiser strategy = new RaceStrategyOptimiser(raceCar, raceTrack, raceConditions);
@@ -168,7 +167,7 @@ class RaceStrategyOptimiserTest {
         );
     }
 
-    @DisplayName("Test simulateLap with null param")
+    @DisplayName("[WB_RSO_06 - Core]: Test simulateLap with null param")
     @ParameterizedTest(name="Test: {index}/3, NullParam: {3}")
     @MethodSource("constructorParamNull")
     void simulateLapWithNullParam(RaceCar car, RaceTrack track, RaceConditions conditions, String nullParams) {
@@ -180,7 +179,7 @@ class RaceStrategyOptimiserTest {
         assertEquals(nullParams + " cannot be null.", error.getMessage());
     }
 
-    @DisplayName("[000 - Critical]: Test simulateLap for multiple laps")
+    @DisplayName("[WB_RSO_07 - Critical]: Test simulateLap for multiple laps")
     @ParameterizedTest(name="Test: {index}/8, laps: {0}, fuelAfterLaps: {1}, tyreWearAfterLaps: {2}")
     @CsvSource({
             "2, 50.0, 0.04",
@@ -203,8 +202,7 @@ class RaceStrategyOptimiserTest {
         );
     }
 
-    // should be implemented in future?
-    @DisplayName("[100 - Additional]: Test simulateLap with different trackTemperature")
+    @DisplayName("[WB_RSO_08 - Additional]: Test simulateLap with different trackTemperature")
     @ParameterizedTest(name="Test: {index}/3, fuelAfterLap: {1}, tyreWearLap: {2}")
     @CsvSource({
             "-5.0, 65.00, 0.02",
@@ -222,7 +220,7 @@ class RaceStrategyOptimiserTest {
         );
     }
 
-    @DisplayName("[001 - Critical]: Test checkPerformPitStop with current lap being final lap")
+    @DisplayName("[WB_RSO_09 - Critical]: Test checkPerformPitStop with current lap being final lap")
     @ParameterizedTest(name="Test: {index}/5, currentLap: {0}, totalLaps: {1}")
     @CsvSource({
             "0, 0",
@@ -238,21 +236,20 @@ class RaceStrategyOptimiserTest {
         assertEquals(null, strategy.checkAndPerformPitStop(currentLap, strategy.getRaceTrack().getNumberOfLaps()));
     }
 
-    // shouldn't it return an error for negative laps?
-    @DisplayName("[001 - Additional?]: Test checkPerformPitStop with negative laps")
+    @DisplayName("[WB_RSO_10 - Core]: Test checkPerformPitStop with negative laps")
     @ParameterizedTest(name="Test: {index}/2, currentLap: {0}, totalLap: {1}")
     @CsvSource({
-            "-2, -1",
+            "-2, 1",
             "-2, 2"
     })
     void checkAndPerformPitStopWithLapsLeft(int currentLap, int totalLap) {
         RaceTrack track = new RaceTrack("testTrack",  4.5, totalLap, 1.0, 1.0);
         RaceStrategyOptimiser strategy = new RaceStrategyOptimiser(raceCar, track, raceConditions);
 
-        assertEquals(null, strategy.checkAndPerformPitStop(currentLap, strategy.getRaceTrack().getNumberOfLaps()));
+        assertThrows(IllegalArgumentException.class, () -> strategy.checkAndPerformPitStop(currentLap, strategy.getRaceTrack().getNumberOfLaps()));
     }
 
-    @DisplayName("[001 - Additional?]: Test checkPerformPitStop with current lap over total laps")
+    @DisplayName("[WB_RSO_11 - Core]: Test checkPerformPitStop with current lap over total laps")
     @ParameterizedTest(name="Test: {index}/2, currentLap: {0}, totalLap: {1}")
     @CsvSource({
             "6, 5",
@@ -262,10 +259,10 @@ class RaceStrategyOptimiserTest {
         RaceTrack track = new RaceTrack("testTrack",  4.5, totalLap, 1.0, 1.0);
         RaceStrategyOptimiser strategy = new RaceStrategyOptimiser(raceCar, track, raceConditions);
 
-        assertEquals(null, strategy.checkAndPerformPitStop(currentLap, strategy.getRaceTrack().getNumberOfLaps()));
+        assertThrows(IllegalArgumentException.class, () -> strategy.checkAndPerformPitStop(currentLap, strategy.getRaceTrack().getNumberOfLaps()));
     }
 
-    @DisplayName("[001 - Additional?]: Test checkPerformPitStop with extreme current lap and total laps")
+    @DisplayName("[WB_RSO_12 - Additional]: Test checkPerformPitStop with extreme current lap and total laps")
     @ParameterizedTest(name="Test: {index}/2, currentLap: {0}, totalLap: {1}")
     @MethodSource("extremeLapValues")
     void checkAndPerformPitStopWithExtremeValues(int currentLap, int totalLap) {
@@ -281,7 +278,7 @@ class RaceStrategyOptimiserTest {
         );
     }
 
-    @DisplayName("[001 - Critical?]: Test checkPerformPitStop with no pitStop needed")
+    @DisplayName("[WB_RSO_13 - Critical]: Test checkPerformPitStop with no pitStop needed")
     @ParameterizedTest(name="Test: {index}/3, currentLap: {3}, reason: {0}, fuelAfter: {1}, tyreWearAfter: {2}")
     @MethodSource("noPitStop")
     void checkAndPerformPitStopFuelAndTyreWearAfterNoPitStop(String reason, double fuelAfter, double tyreWearAfter, int lap) {
@@ -296,9 +293,7 @@ class RaceStrategyOptimiserTest {
                 () -> assertEquals(reason, actualReason),
                 () -> assertEquals(fuelAfter, strategy.getRaceCar().getCurrentFuel()),
                 () -> assertEquals(tyreWearAfter, strategy.getRaceCar().getCurrentTyreWear())
-
         );
-
     }
     private static Stream<Arguments> noPitStop () {
         return Stream.of(
@@ -308,7 +303,7 @@ class RaceStrategyOptimiserTest {
         );
     }
 
-    @DisplayName("[001 - Critical?]: Test checkPerformPitStop with fuel and tyre reset after pitStop")
+    @DisplayName("[WB_RSO_14 - Critical]: Test checkPerformPitStop with fuel and tyre reset after pitStop")
     @ParameterizedTest(name="Test: {index}/3, currentLap: {3}, reason: {0}, fuelAfter: {1}, tyreWearAfter: {2}")
     @MethodSource("pitStopped")
     void checkAndPerformPitStopFuelAndTyreWearResetAfterPitStop(String reason, double fuelAfter, double tyreWearAfter, int lap) {
@@ -327,7 +322,6 @@ class RaceStrategyOptimiserTest {
                 () -> assertEquals(tyreWearAfter, strategy.getRaceCar().getCurrentTyreWear())
 
         );
-
     }
     private static Stream<Arguments> pitStopped () {
         return Stream.of(
@@ -337,7 +331,7 @@ class RaceStrategyOptimiserTest {
         );
     }
 
-    @DisplayName("[001 - Critical?]: Test checkPerformPitStop for fuel")
+    @DisplayName("[WB_RSO_15 - Critical]: Test checkPerformPitStop for fuel")
     @ParameterizedTest(name="Test: {index}/3, currentLap: {0}, totalLap: {1}")
     @CsvSource({
             "5, 10",
@@ -355,7 +349,7 @@ class RaceStrategyOptimiserTest {
         assertEquals("Fuel", strategy.checkAndPerformPitStop(currentLap, strategy.getRaceTrack().getNumberOfLaps()));
     }
 
-    @DisplayName("[001 - Critical?]: Test checkPerformPitStop for fuelCapacity after pitStop")
+    @DisplayName("[WB_RSO_16 - Critical]: Test checkPerformPitStop for fuelCapacity after pitStop")
     @ParameterizedTest(name="Test: {index}/3, currentLap: {0}, totalLap: {1}, fuelAfterPitStop: {2}")
     @CsvSource({
             "5, 10, 80.0",
@@ -374,8 +368,7 @@ class RaceStrategyOptimiserTest {
         assertEquals(fuelAfterPitStop, strategy.getRaceCar().getCurrentFuel());
     }
 
-    // floating-point issue that lap 8
-    @DisplayName("[001 - Critical?]: Test checkPerformPitStop for tyres")
+    @DisplayName("[WB_RSO_17 - Critical]: Test checkPerformPitStop for tyres")
     @ParameterizedTest(name="Test: {index}/3, currentLap: {0}, totalLap: {1}, tyreWear: {2}")
     @CsvSource({
             "8, 10, 0.0",
@@ -405,8 +398,7 @@ class RaceStrategyOptimiserTest {
         );
     }
 
-    // floating-point issue? threshold 0.8 but gets 0.799999 as actual tyreWear
-    @DisplayName("[001 - Critical?]: Test checkPerformPitStop for tyreWear after pitStop")
+    @DisplayName("[WB_RSO_18 - Critical]: Test checkPerformPitStop for tyreWear after pitStop")
     @ParameterizedTest(name="Test: {index}/3, currentLap: {0}, totalLap: {1}, tyreWearAfterPitStop: {2}")
     @CsvSource({
             "8, 10, 0.0",
@@ -433,7 +425,7 @@ class RaceStrategyOptimiserTest {
         assertEquals(tyreWearAfterPitStop, strategy.getRaceCar().getCurrentTyreWear());
     }
 
-    @DisplayName("[001 - Critical?]: Test checkPerformPitStop for fuel and tyres")
+    @DisplayName("[WB_RSO_19 - Critical]: Test checkPerformPitStop for fuel and tyres")
     @ParameterizedTest(name="Test: {index}/3, currentLap: {0}, totalLap: {1}")
     @CsvSource({
             "3, 5",
@@ -459,7 +451,7 @@ class RaceStrategyOptimiserTest {
         assertEquals("Fuel & Tyres", strategy.checkAndPerformPitStop(currentLap, strategy.getRaceTrack().getNumberOfLaps()));
     }
 
-    @DisplayName("[004 - Core?]: Test checkAndPerformPitStop with different airTemperature")
+    @DisplayName("[WB_RSO_20 - Core]: Test checkAndPerformPitStop with different airTemperature")
     @ParameterizedTest(name="Test: {index}/10, airTemperature: {0}°C, reason: {1}")
     @MethodSource("pitStopDifferentTemp")
     void checkAndPerformPitStopWithDifferentAirTemperature(double airTemperature, String reason) {
@@ -496,8 +488,7 @@ class RaceStrategyOptimiserTest {
         );
     }
 
-    // should return error for mismatch total lap?
-    @DisplayName("[001 - Core?]: Test checkAndPerformPitStop with totalLaps different from RaceTrack totalLaps")
+    @DisplayName("[WB_RSO_21 - Core]: Test checkAndPerformPitStop with totalLaps different from RaceTrack totalLaps")
     @ParameterizedTest(name="Test: {index}/3, RaceTrackTotalLap: {0}, paramTotalLap: {1}")
     @CsvSource({
             "0, 5",
@@ -512,7 +503,7 @@ class RaceStrategyOptimiserTest {
     }
 
 
-    @DisplayName("[006 - Core?]: Test planPitStops with no laps")
+    @DisplayName("[WB_RSO_22 - Critical]: Test planPitStops with no laps")
     @Test
     void planPitStopsWithNoLaps() {
         RaceTrack track = new RaceTrack("raceTrack", 50, 0, 1.0, 1.0);
@@ -524,7 +515,7 @@ class RaceStrategyOptimiserTest {
         assertEquals(expected, strategy.planPitStops());
     }
 
-    @DisplayName("[005 - Critical]: Test planPitStops  with no necessary pit stops")
+    @DisplayName("[WB_RSO_23 - Critical]: Test planPitStops with no necessary pit stops")
     @ParameterizedTest(name="Test: {index}/4, numOfLaps: {0}")
     @ValueSource(ints = {1, 2, 3, 4})
     void planPitStopsWithNoStops(int laps) {
@@ -536,7 +527,7 @@ class RaceStrategyOptimiserTest {
         assertEquals(expected, strategy.planPitStops());
     }
 
-    @DisplayName("[007 - Critical]: Test planPitStops method for fuel")
+    @DisplayName("[WB_RSO_24 - Critical]: Test planPitStops for fuel")
     @ParameterizedTest(name="Test: {index}/2, pitStopLaps: {1}")
     @MethodSource("pitStopsListFuel")
     void planPitStopsForFuel(int laps, List<Integer> pitStops) {
@@ -555,8 +546,7 @@ class RaceStrategyOptimiserTest {
         );
     }
 
-    // floating-point issue? same as checkPerformPitStop tyre. threshold 0.8 but gets 0.799999 as actual tyreWear
-    @DisplayName("[001 - Critical?]: Test checkPerformPitStop for tyres")
+    @DisplayName("[WB_RSO_25 - Critical]: Test checkPerformPitStop for tyres")
     @ParameterizedTest(name="Test: {index}/3, pitStopLaps: {1}")
     @MethodSource("pitStopsListTyres")
     void planPitStopsForTyres (int laps, List<Integer> pitStops, double tyreWear) {
@@ -590,8 +580,7 @@ class RaceStrategyOptimiserTest {
         );
     }
 
-    // lacking if statement content
-    @DisplayName("[005 - Additional?]: Test planPitStops with too high fuel consumption to finish first lap")
+    @DisplayName("[WB_RSO_26 - Critical]: Test planPitStops with too high fuel consumption to finish first lap")
     @Test
     void planPitStopsWithHighFuelConsumption() {
         RaceCar car = new RaceCar(
@@ -609,62 +598,19 @@ class RaceStrategyOptimiserTest {
         assertEquals(expected, strategy.planPitStops());
     }
 
-
-//    @DisplayName("[007 - Core?]: Test planPitStops for one before last lap")
-//    @ParameterizedTest(name="Test: {index}/3, totalLaps: {0}, pitStopLap: {1}")
-//    @MethodSource("pitStopsBeforeLast")
-//    void planPitStopsForOneBeforeLastLap(int laps) {
-//        RaceTrack track = new RaceTrack("raceTrack", 50, laps, 1.0, 1.0);
-//
-//        RaceStrategyOptimiser strategy = new RaceStrategyOptimiser(raceCar, track, raceConditions);
-//
-//        List<Integer> expected = new ArrayList<>();
-//        expected.add(pitStop);
-//
-//        assertEquals(expected, strategy.planPitStops());
-//    }
-//    private static Stream<Arguments> pitStopsBeforeLast() {
-//        return Stream.of(
-//                Arguments.of(6, List.of(5)),
-//                Arguments.of(21, Arrays.asList(5, 10, 20))
-//        );
-//    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    @DisplayName("[009 - Additional?]: Test getRaceCar method with RaceCar")
+    @DisplayName("[WB_RSO_27 - Core]: Test getRaceCar")
     @Test
     void getRaceCar() {
         assertEquals(raceCar, raceStrategyOptimiser.getRaceCar());
     }
 
-    @DisplayName("[010 - Additional?]: Test getRaceTrack method with RaceTrack")
+    @DisplayName("[WB_RSO_28 - Core]: Test getRaceTrack")
     @Test
     void getRaceTrack() {
         assertEquals(raceTrack, raceStrategyOptimiser.getRaceTrack());
     }
 
-    @DisplayName("[01 - Additional?]: Test getRaceConditions method with valid RaceConditions")
+    @DisplayName("[WB_RSO_29 - Core]: Test getRaceConditions")
     @Test
     void getRaceConditions() {
         assertEquals(raceConditions, raceStrategyOptimiser.getRaceConditions());
