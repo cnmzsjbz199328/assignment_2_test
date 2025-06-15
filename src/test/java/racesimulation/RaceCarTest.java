@@ -85,7 +85,7 @@ class RaceCarTest {
         });
     }
 
-    @DisplayName("[WB_RCT_06 - Cor]e: Testing constructor (IllegalArgumentException for Fuel Capacity).")
+    @DisplayName("[WB_RCT_06 - Core]: Testing constructor (IllegalArgumentException for Fuel Capacity).")
     @Test
     public void testConstructorInvalidArgumentExceptionFuelCapacity() {
         assertThrows(IllegalArgumentException.class, () -> {

@@ -69,7 +69,7 @@ class TemperatureRangeTest {
     }
 
     @DisplayName("[WB_TER_05 - Critical]: Test toString with valid values")
-    @ParameterizedTest(name="Test: {index}/2")
+    @ParameterizedTest(name="Test: {index}/3")
     @CsvSource({
             "1.0, 10.0",
             "0.01, 10.5",

@@ -452,7 +452,7 @@ class RaceStrategyOptimiserTest {
     }
 
     @DisplayName("[WB_RSO_20 - Core]: Test checkAndPerformPitStop with different airTemperature")
-    @ParameterizedTest(name="Test: {index}/10, airTemperature: {0}°C, reason: {1}")
+    @ParameterizedTest(name="Test: {index}/9, airTemperature: {0}°C, reason: {1}")
     @MethodSource("pitStopDifferentTemp")
     void checkAndPerformPitStopWithDifferentAirTemperature(double airTemperature, String reason) {
         RaceCar car = new RaceCar(
