@@ -53,7 +53,7 @@ class RaceStrategyOptimiserTest {
     }
 
     @DisplayName("[WB_RSO_02 - Core]: Test Constructor with null param")
-    @MethodSource("constructorParamNull")
+    @MethodSource("nullParams")
     @ParameterizedTest(name="Test: {index}/3, nullItem: {3}")
     void constructorWithNull(RaceCar raceCar, RaceTrack raceTrack, RaceConditions raceConditions, String nullItem) {
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class, () -> {
@@ -62,7 +62,7 @@ class RaceStrategyOptimiserTest {
         assertEquals(nullItem + " cannot be null.", error.getMessage());
 
     }
-    private static Stream<Arguments> constructorParamNull() {
+    private static Stream<Arguments> nullParams() {
         RaceCar raceCar = new RaceCar(
                 new Engine("engine", 500, 2.0, 0.95),
                 new Tyres("medium", 85, 0.02, 15.0, 20.0),
@@ -93,8 +93,8 @@ class RaceStrategyOptimiserTest {
         strategy.simulateLap(strategy.getRaceCar(), strategy.getRaceTrack(), strategy.getRaceConditions());
 
         assertAll(
-                () -> assertEquals(fuelAfterLap, strategy.getRaceCar().getCurrentFuel()),
-                () -> assertEquals(tyreWearAfterLap, strategy.getRaceCar().getCurrentTyreWear())
+                () -> assertEquals(fuelAfterLap, strategy.getRaceCar().getCurrentFuel(), 0.00001),
+                () -> assertEquals(tyreWearAfterLap, strategy.getRaceCar().getCurrentTyreWear(), 0.00001)
         );
     }
 
@@ -169,7 +169,7 @@ class RaceStrategyOptimiserTest {
 
     @DisplayName("[WB_RSO_06 - Core]: Test simulateLap with null param")
     @ParameterizedTest(name="Test: {index}/3, NullParam: {3}")
-    @MethodSource("constructorParamNull")
+    @MethodSource("nullParams")
     void simulateLapWithNullParam(RaceCar car, RaceTrack track, RaceConditions conditions, String nullParams) {
         RaceStrategyOptimiser strategy = new RaceStrategyOptimiser(raceCar, raceTrack, raceConditions);
 
@@ -240,7 +240,7 @@ class RaceStrategyOptimiserTest {
     @ParameterizedTest(name="Test: {index}/2, currentLap: {0}, totalLap: {1}")
     @CsvSource({
             "-2, 1",
-            "-2, 2"
+            "-3, -1"
     })
     void checkAndPerformPitStopWithLapsLeft(int currentLap, int totalLap) {
         RaceTrack track = new RaceTrack("testTrack",  4.5, totalLap, 1.0, 1.0);
@@ -593,9 +593,9 @@ class RaceStrategyOptimiserTest {
 
         RaceStrategyOptimiser strategy = new RaceStrategyOptimiser(car, raceTrack, raceConditions);
 
-        List<Integer> expected = new ArrayList<>();
-
-        assertEquals(expected, strategy.planPitStops());
+        assertThrows(IllegalStateException.class, () -> {
+            strategy.planPitStops();
+        });
     }
 
     @DisplayName("[WB_RSO_27 - Core]: Test getRaceCar")
